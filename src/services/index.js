@@ -4,3 +4,4 @@ export { getAllLaboratoriesDB, updateLaboratoryDB, createLaboratoryDB } from './
 export { getAllMenusDB, getMenuByLevelDB, createMenuDB, updateMenuDB } from './menuService';
 export { getAllRolesDB, createRoleDB } from './roleService';
 export { getAllAlliancesDB, createAllAlliancesDB } from './alliancesService';
+export { getAllParamExamsDB } from './paramExamsService';

@@ -6,6 +6,7 @@ import MenusPage from '../components/pages/menus/MenusPage';
 import RolesPage from '../components/pages/roles/RolesPage';
 import AlliancesPage from '../components/pages/alliances/AlliancesPage';
 import ExamsPage from '../components/pages/exams/ExamsPage';
+import ParamExamsPage from '../components/pages/param_exams/ParamExamsPage';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -42,6 +43,10 @@ const privateRoutes = [
   {
     path: '/exams',
     element: <ExamsPage />,
+  },
+  {
+    path: '/param-exams',
+    element: <ParamExamsPage />,
   },
   {
     path: '*',
