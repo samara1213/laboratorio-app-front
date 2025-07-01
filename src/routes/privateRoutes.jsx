@@ -7,6 +7,8 @@ import RolesPage from '../components/pages/roles/RolesPage';
 import AlliancesPage from '../components/pages/alliances/AlliancesPage';
 import ExamsPage from '../components/pages/exams/ExamsPage';
 import ParamExamsPage from '../components/pages/param_exams/ParamExamsPage';
+import CreateCustomerPage from '../components/pages/customer/CreateCustomerPage';
+import EditCustomerPage from '../components/pages/customer/EditCustomerPage';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -47,6 +49,14 @@ const privateRoutes = [
   {
     path: '/param-exams',
     element: <ParamExamsPage />,
+  },
+  {
+    path: '/customers/create',
+    element: <CreateCustomerPage />,
+  },
+  {
+    path: '/customers/edit',
+    element: <EditCustomerPage />,
   },
   {
     path: '*',

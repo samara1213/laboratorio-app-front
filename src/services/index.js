@@ -5,3 +5,4 @@ export { getAllMenusDB, getMenuByLevelDB, createMenuDB, updateMenuDB } from './m
 export { getAllRolesDB, createRoleDB } from './roleService';
 export { getAllAlliancesDB, createAllAlliancesDB } from './alliancesService';
 export { getAllParamExamsDB, createParamExamDB, updateParamExamDB } from './paramExamsService';
+export { createCustomerDB, searchCustomerByDocumentDB, updateCustomerDB } from './customerService';

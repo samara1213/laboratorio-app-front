@@ -39,6 +39,8 @@ export default function Sidebar({ open, onClose }) {
           <Link to="/alliances" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1e232a] transition"><Icon icon="mdi:handshake" className="w-5 h-5" /> Aliados</Link>
           <Link to="/exams" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1e232a] transition"><Icon icon="mdi:flask-outline" className="w-5 h-5" /> Exámenes</Link>
           <Link to="/param-exams" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1e232a] transition"><Icon icon="mdi:flask" className="w-5 h-5" /> Parámetros de Exámenes</Link>
+          <Link to="/customers/create" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1e232a] transition"><Icon icon="mdi:account-plus" className="w-5 h-5" /> Crear Cliente</Link>
+          <Link to="/customers/edit" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1e232a] transition"><Icon icon="mdi:account-edit" className="w-5 h-5" /> Editar Cliente</Link>
         </nav>
         <div className="px-4 pb-6 mt-auto">
           <a href="#" onClick={handleLogout} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1e232a] transition"><Icon icon="mdi:logout" className="w-5 h-5" /> Log Out</a>
