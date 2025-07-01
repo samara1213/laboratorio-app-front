@@ -7,8 +7,9 @@ import MuiSelect from '../../mui/MuiSelect';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../hooks/authStore';
 import { getAllExamsDB } from '../../../services/examsService';
-import { getAllParamExamsDB } from '../../../services/paramExamsService';
+import { getAllParamExamsDB, createParamExamDB, updateParamExamDB } from '../../../services/paramExamsService';
 import CreateParamExamModal from './CreateParamExamModal';
+import EditParamExamModal from './EditParamExamModal';
 
 export default function ParamExamsPage() {
     const { user } = useAuthStore();
@@ -40,23 +41,8 @@ export default function ParamExamsPage() {
             setLoading(false);
             return;
         }
-        setLoading(true);
-        (async () => {
-            try {
-                const response = await getAllParamExamsDB(selectedExam);
-                const paramsData = (response.data.data || []).map(param => ({
-                    ...param,
-                    accion: (
-                        <EditButton onClick={() => handleEdit(param)} />
-                    )
-                }));
-                setParams(paramsData);
-            } catch {
-                setParams([]);
-            } finally {
-                setLoading(false);
-            }
-        })();
+        refreshParams();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedExam]);
 
     const handleEdit = (param) => {
@@ -64,23 +50,55 @@ export default function ParamExamsPage() {
         setEditModalOpen(true);
     };
 
+    // Función para refrescar la lista de parámetros
+    const refreshParams = async () => {
+        if (!selectedExam) return;
+        setLoading(true);
+        try {
+            const response = await getAllParamExamsDB(selectedExam);
+            const paramsData = (response.data.data || []).map(param => ({
+                ...param,
+                accion: (
+                    <EditButton onClick={() => handleEdit(param)} />
+                )
+            }));
+            setParams(paramsData);
+        } catch {
+            setParams([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Lógica para crear un parámetro de examen
     const handleCreateParamExam = async (data) => {
-        // await createParamExamDB(data);
-        // setModalOpen(false);
-        // // Refresca la tabla después de crear
-        // if (selectedExam) {
-        //     setLoading(true);
-        //     const response = await getAllParamExamsDB(selectedExam);
-        //     const paramsData = (response.data.data || []).map(param => ({
-        //         ...param,
-        //         accion: (
-        //             <EditButton onClick={() => handleEdit(param)} />
-        //         )
-        //     }));
-        //     setParams(paramsData);
-        //     setLoading(false);
-        // }
+        try {
+            setLoading(true);
+            const responde = await createParamExamDB(data);
+            await refreshParams();
+            setModalOpen(false);
+            return responde; 
+        } catch (error) {
+            
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Lógica para editar un parámetro de examen
+    const handleEditParamExam = async (data) => {
+        try {
+            setLoading(true);
+            const response = await updateParamExamDB(paramToEdit.par_id, data);
+            await refreshParams();
+            setEditModalOpen(false);
+            return response;
+        } catch (error) {
+            throw error;
+        } finally {
+            setLoading(false);
+        }
     };
 
     const columns = [
@@ -106,7 +124,7 @@ export default function ParamExamsPage() {
                             <option key={exam.exa_id} value={exam.exa_id}>{exam.exa_name}</option>
                         ))}
                     </MuiSelect>
-                    <CreateButton title="Crear parámetro" onClick={() => setModalOpen(true)} />
+                    <CreateButton title="Crear parámetro" onClick={() => setModalOpen(true)} disabled={!selectedExam} />
                 </div>
                 <div className="pb-4">
                     <MuiTable columns={columns} data={params} />
@@ -118,7 +136,14 @@ export default function ParamExamsPage() {
                     loading={loading}
                     examId={selectedExam}
                 />
-                {/* Aquí irían los modales de editar */}
+                <EditParamExamModal
+                    open={editModalOpen}
+                    onClose={() => setEditModalOpen(false)}
+                    onSubmit={handleEditParamExam}
+                    loading={loading}
+                    param={paramToEdit}
+                    examId={selectedExam}
+                />
             </CardWithTitle>
         </LayoutDashboard>
     );

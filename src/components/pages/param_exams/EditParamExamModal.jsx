@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import MuiModal from '../../mui/MuiModal';
 import CardWithTitle from '../../CardWithTitle';
 import MuiInput from '../../mui/MuiInput';
@@ -6,12 +7,21 @@ import CreateButton from '../../mui/CreateButton';
 import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import MuiCheck from '../../mui/MuiCheck';
-import { useState } from 'react';
 
-export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, loading = false, examId }) {
-    const { register, handleSubmit, reset, formState: { errors }, control } = useForm();
+export default function EditParamExamModal({ open, onClose, onSubmit: onSave, loading = false, param, examId }) {
+    const { register, handleSubmit, reset, formState: { errors }, control, setValue } = useForm({
+        defaultValues: param || {}
+    });
 
-    // Usar useWatch para observar el valor del checkbox
+    // Actualizar valores cuando cambia el parámetro a editar
+    useEffect(() => {
+        if (param) {
+            reset(param || {});
+        } else {
+            reset();
+        }
+    }, [param, setValue, reset]);
+
     const aplicaRango = useWatch({ control, name: 'par_range', defaultValue: false });
 
     const handleClose = () => {
@@ -21,30 +31,34 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
 
     const onSubmit = async (data) => {
         try {
-            const payload = { 
-                ...data, 
+            const payload = {
                 exam: examId,
+                par_name: data.par_name,
+                par_default_value: data.par_default_value,
+                par_range: data.par_range,
+                par_reference_value: data.par_reference_value || null,
+                par_unit_extent: data.par_unit_extent || null,
                 par_max_child: +data.par_max_child || null,
                 par_min_child: +data.par_min_child || null,
                 par_max_man: +data.par_max_man || null,
                 par_min_man: +data.par_min_man || null,
                 par_min_woman: +data.par_min_woman || null,
-                par_max_woman: +data.par_max_woman || null 
-            };            
+                par_max_woman: +data.par_max_woman || null                
+             };
             const response = await onSave(payload);
-            toast.success(response?.data?.message || 'Parámetro creado correctamente');
+            toast.success(response.data.message || 'Parámetro editado correctamente');
             reset();
             onClose();
         } catch (error) {
             const msg = error?.response?.data?.message;
-            const errorMsg = Array.isArray(msg) ? msg[0] : (msg || 'Error al crear el parámetro');
+            const errorMsg = Array.isArray(msg) ? msg[0] : (msg || 'Error al editar el parámetro');
             toast.error(errorMsg);
         }
     };
 
     return (
         <MuiModal open={open} onClose={handleClose} maxWidth="max-w-3xl">
-            <CardWithTitle title="Crear parámetro" loading={loading}>
+            <CardWithTitle title="Editar parámetro" loading={loading}>
                 <form
                     onSubmit={handleSubmit(onSubmit)}
                     className="grid gap-4 p-2 sm:grid-cols-2 max-w-full w-full"
@@ -145,7 +159,7 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                         />
                     </div>
                     <div className="flex justify-end gap-2 sm:col-span-2 sticky bottom-0 bg-blue-50/80 pt-2 pb-1 z-10">
-                        <CreateButton type="submit" title="Crear" />
+                        <CreateButton type="submit" title="Guardar cambios" />
                         <CancelButton onClick={handleClose} />
                     </div>
                 </form>
