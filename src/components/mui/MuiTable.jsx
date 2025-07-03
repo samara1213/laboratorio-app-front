@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 /**
  * Componente de tabla reutilizable y responsive.
@@ -86,12 +86,14 @@ export default function MuiTable({ columns = [], data = [], className = '' }) {
                       className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 whitespace-nowrap align-middle group-hover:text-blue-700 transition-colors duration-150 text-xs sm:text-sm font-medium group-hover:bg-blue-100/40 rounded-lg shadow-sm"
                     >
                       <div className="flex items-center gap-2">
-                        {/* Si es la columna de acciones, centra el contenido */}
-                        {col.key === 'accion' ? (
-                          <div className="flex justify-center items-center w-full">{row[col.key]}</div>
-                        ) : (
-                          <span className="break-words max-w-xs inline-block whitespace-pre-line">{row[col.key]}</span>
-                        )}
+                        {/* Renderiza usando la función render si existe, si no el valor plano */}
+                        {col.render
+                          ? col.render(row)
+                          : (col.key === 'accion'
+                              ? <div className="flex justify-center items-center w-full">{row[col.key]}</div>
+                              : <span className="break-words max-w-xs inline-block whitespace-pre-line">{row[col.key]}</span>
+                            )
+                        }
                       </div>
                     </td>
                   ))}
