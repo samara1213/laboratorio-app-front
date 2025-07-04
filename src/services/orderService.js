@@ -16,3 +16,18 @@ export const changeStatusOrderDB = async (data) => {
     console.log('changeStatusOrderDB', data);
     return await laboratorioApi.patch(`/orders/change/status`, data);
 }
+export const getOrdersByCustomerIdDB = async (data) => {
+    return await laboratorioApi.post(`/orders/customers/laboaratory`, data);
+}
+export const getResultsByOrderIdDB = async (orderId) => {
+    return await laboratorioApi.get(`/orders/results/${orderId}`);
+}
+export const generatePdfOrderDB = async (orderId) => {
+    return await laboratorioApi.get(`/orders/generates/results/${orderId}`);
+}
+export const sendResultsOrderDB = async (orderId) => {
+    return await laboratorioApi.get(`/orders/emails/${orderId}`);
+}
+export const getUrlPrefirredOrderDB = async (orderId) => {
+    return await laboratorioApi.get(`/orders/urlprefirmate/${orderId}`);
+}

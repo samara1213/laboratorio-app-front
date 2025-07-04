@@ -11,6 +11,8 @@ import CreateCustomerPage from '../components/pages/customer/CreateCustomerPage'
 import EditCustomerPage from '../components/pages/customer/EditCustomerPage';
 import CreateOrderPage from '../components/pages/orders/CreateOrderPage';
 import ResultsPage from '../components/pages/results/ResultsPage';
+import EditResultPage from '../components/pages/results/EditResultPage';
+import SearchOrdersPage from '../components/pages/orders/SearchOrdersPage';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -67,6 +69,14 @@ const privateRoutes = [
   {
     path: '/results/:orderId',
     element: <ResultsPage />,
+  },
+  {
+    path: '/results/edit/:orderId',
+    element: <EditResultPage />,
+  },
+  {
+    path: '/orders/search',
+    element: <SearchOrdersPage />,
   },
   {
     path: '*',

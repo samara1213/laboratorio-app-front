@@ -44,6 +44,7 @@ export default function Sidebar({ open, onClose }) {
           <Link to="/orders/create" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1e232a] transition">
             <Icon icon="mdi:clipboard-plus-outline" className="w-5 h-5" /> Crear Orden
           </Link>
+          <Link to="/orders/search" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1e232a] transition"><Icon icon="mdi:magnify" className="w-5 h-5" /> Buscar Órdenes</Link>
         </nav>
         <div className="px-4 pb-6 mt-auto">
           <a href="#" onClick={handleLogout} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1e232a] transition"><Icon icon="mdi:logout" className="w-5 h-5" /> Log Out</a>

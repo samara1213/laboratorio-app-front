@@ -16,6 +16,7 @@ import { useResultsActions } from '../../../hooks/resultsStore';
 const examColumns = [
   { key: 'exa_name', label: 'Nombre del examen' },
   { key: 'exa_description', label: 'Descripcion' },
+  { key: 'proceso', label: 'Proceso' },
   { key: 'accion', label: 'Acciones' },
 ];
 
@@ -51,6 +52,9 @@ export default function ResultsPage() {
     return (exams || []).map(exam => ({
       ...exam,
       order_id: orderId,
+      proceso: isExamComplete(exam, completedExams)
+        ? <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-bold border border-green-300">Completado</span>
+        : <span className="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 text-xs font-bold border border-yellow-300">Pendiente</span>,
       accion: (
         <EditButton onClick={() => handleEditExam(exam)} />
       ),

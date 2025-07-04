@@ -59,7 +59,18 @@ export default function ResultModal({ open, exam, onClose }) {
       resultado: paramResults[param.par_id] ?? '',
       observacion: observaciones || ''
     }));
-    saveExamResults(results);
+    // Verificar si todos los parámetros tienen resultado (no vacío)
+    const allComplete = (exam.parameters || []).every(param => {
+      const value = paramResults[param.par_id];
+      return value !== undefined && value !== null && value !== '';
+    });
+    if (allComplete) {
+      // Guardar como completado (ya lo hace el flujo actual)
+      saveExamResults(results);
+    } else {
+      // Guardar como pendiente (igual, pero podrías agregar lógica extra si lo deseas)
+      saveExamResults(results);
+    }
     onClose();
   };
 
