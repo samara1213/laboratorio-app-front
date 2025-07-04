@@ -10,6 +10,7 @@ import ParamExamsPage from '../components/pages/param_exams/ParamExamsPage';
 import CreateCustomerPage from '../components/pages/customer/CreateCustomerPage';
 import EditCustomerPage from '../components/pages/customer/EditCustomerPage';
 import CreateOrderPage from '../components/pages/orders/CreateOrderPage';
+import ResultsPage from '../components/pages/results/ResultsPage';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -62,6 +63,10 @@ const privateRoutes = [
   {
     path: '/orders/create',
     element: <CreateOrderPage />,
+  },
+  {
+    path: '/results/:orderId',
+    element: <ResultsPage />,
   },
   {
     path: '*',

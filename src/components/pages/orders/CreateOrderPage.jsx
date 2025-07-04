@@ -147,7 +147,7 @@ export default function CreateOrderPage() {
                 ord_total_value: Number(totals.total), 
                 ord_discount_value: Number(totals.discountValue),
                 lab_id: user?.laboratory?.lab_id,
-                "ord_status": "PENDIENTE"
+                ord_status: "PENDIENTE"
             };
             const response = await createOrderDB(orderData);            
             toast.success(response?.data?.message || 'Orden creada exitosamente');
