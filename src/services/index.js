@@ -10,3 +10,4 @@ export { createOrderDB, getOrdersByStatusDB, deleteOrderDB, getOrderByIdDB,
          getOrdersByCustomerIdDB, getResultsByOrderIdDB, generatePdfOrderDB,
          sendResultsOrderDB, getUrlPrefirredOrderDB } from './orderService';
 export { createResultDB, updateResultExamDB } from './resultService';
+export { getAllUsersDB, updateUserDB, createUserDB } from './userService';
