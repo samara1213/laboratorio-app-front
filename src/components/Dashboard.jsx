@@ -2,13 +2,15 @@ import LayoutDashboard from './dashboard/LayoutDashboard';
 import CardWithTitle from './CardWithTitle';
 import MuiTable from './mui/MuiTable';
 import { useEffect, useState } from 'react';
-import { getOrdersByStatusDB, deleteOrderDB } from '../services/orderService';
+import { getOrdersByStatusDB, deleteOrderDB, getOrderByIdDB } from '../services/orderService';
 import { useAuthStore } from '../hooks/authStore';
 import EditButton from './mui/EditButton';
 import DeleteButton from './mui/MuiDeleteButton';
 import ConfirmDialog from './mui/ConfirmDialog';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import PreviewButton from './mui/PreviewButton';
+import PreviewExamsModal from './dashboard/PreviewExamsModal';
 
 const columns = [
   { key: 'ord_code', label: 'N° Orden' },
@@ -24,13 +26,23 @@ function Dashboard() {
   const { user } = useAuthStore();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [orderToPreview, setOrderToPreview] = useState(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
   const navigate = useNavigate();
 
   const fetchOrders = async () => {
     if (!user?.laboratory?.lab_id) return;
     try {
-      const response = await getOrdersByStatusDB({lab_id: user.laboratory.lab_id, ord_status: 'PENDIENTE'});
-      const data = (response.data.data || []).map(order => ({
+      // Obtener órdenes PENDIENTE y PROCESANDO
+      const [pendRes, procRes] = await Promise.all([
+        getOrdersByStatusDB({ lab_id: user.laboratory.lab_id, ord_status: 'PENDIENTE' }),
+        getOrdersByStatusDB({ lab_id: user.laboratory.lab_id, ord_status: 'PROCESANDO' })
+      ]);
+      const pendData = pendRes.data.data || [];
+      const procData = procRes.data.data || [];
+      const allOrders = [...pendData, ...procData];
+      const data = allOrders.map(order => ({
         ...order,
         cus_document_number: order.customer?.cus_document_number || '',
         customer_name: `${order.customer?.cus_first_name || ''} ${order.customer?.cus_first_lastname || ''}`,
@@ -39,7 +51,9 @@ function Dashboard() {
             className={
               order.ord_status === 'PENDIENTE'
                 ? 'px-3 py-1 rounded-full text-xs font-bold bg-orange-200 text-orange-900 border border-orange-400 shadow-sm'
-                : 'px-3 py-1 rounded-full text-xs font-bold bg-gray-200 text-gray-700 border border-gray-300'
+                : order.ord_status === 'PROCESANDO'
+                  ? 'px-3 py-1 rounded-full text-xs font-bold bg-purple-200 text-purple-900 border border-purple-400 shadow-sm'
+                  : 'px-3 py-1 rounded-full text-xs font-bold bg-gray-200 text-gray-700 border border-gray-300'
             }
           >
             {order.ord_status}
@@ -48,6 +62,7 @@ function Dashboard() {
         actions: (
           <div className="flex gap-2">
             <EditButton onClick={() => navigate(`/results/${order.ord_id}`)} />
+            <PreviewButton onClick={() => handlePreview(order)} />
             <DeleteButton onClick={() => handleDelete(order)} />
           </div>
         ),
@@ -85,6 +100,26 @@ function Dashboard() {
     setOrderToDelete(null);
   };
 
+  // Handler para vista previa
+  const handlePreview = async (order) => {
+    setLoadingPreview(true);
+    try {
+      const response = await getOrderByIdDB(order.ord_id);
+      const orderData = response.data.data;
+      setOrderToPreview(orderData);
+      setPreviewOpen(true);
+    } catch (error) {
+      toast.error('No se pudo obtener la información de la orden');
+    } finally {
+      setLoadingPreview(false);
+    }
+  };
+  const handleClosePreview = async () => {
+    setPreviewOpen(false);
+    setOrderToPreview(null);
+    await fetchOrders();
+  };
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -93,6 +128,7 @@ function Dashboard() {
     <LayoutDashboard>
       <CardWithTitle title="Órdenes pendientes">
         <MuiTable columns={columns} data={orders} />
+        <PreviewExamsModal open={previewOpen} onClose={handleClosePreview} order={orderToPreview} loading={loadingPreview} />
         <ConfirmDialog
           open={confirmOpen}
           title="Eliminar orden"

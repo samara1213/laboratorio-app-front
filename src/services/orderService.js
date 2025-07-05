@@ -13,7 +13,7 @@ export const getOrderByIdDB = async (orderId) => {
     return await laboratorioApi.get(`/orders/${orderId}`);
 }
 export const changeStatusOrderDB = async (data) => {
-    console.log('changeStatusOrderDB', data);
+    
     return await laboratorioApi.patch(`/orders/change/status`, data);
 }
 export const getOrdersByCustomerIdDB = async (data) => {

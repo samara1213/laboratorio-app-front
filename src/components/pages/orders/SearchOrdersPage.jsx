@@ -60,11 +60,13 @@ export default function SearchOrdersPage() {
               <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-xs font-bold border border-red-300">Cancelada</span> :
             status === 'FINALIZADA' ?
               <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-bold border border-green-300">Finalizada</span> :
+            status === 'PROCESANDO' ?
+              <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-xs font-bold border border-purple-300">Procesando</span> :
               <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 text-xs font-bold border border-gray-300">{status}</span>
           ),
           accion: (
             (() => {
-              if (status === 'PENDIENTE' || status === 'CANCELADA') return null;
+              if (status === 'PENDIENTE' || status === 'PROCESANDO' || status === 'CANCELADA') return null;
               if (status === 'FINALIZADA') {
                 return (
                   <div className="flex gap-1 items-center">
