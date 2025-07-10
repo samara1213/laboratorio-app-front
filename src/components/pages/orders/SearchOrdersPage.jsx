@@ -12,6 +12,7 @@ import MailButton from '../../mui/MailButton';
 import PrintButton from '../../mui/PrintButton';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import MuiModalLoader from '../../mui/MuiModalLoader';
 
 
 export default function SearchOrdersPage() {
@@ -27,6 +28,7 @@ export default function SearchOrdersPage() {
   const [loading, setLoading] = useState(false);
   const [generatingPdfId, setGeneratingPdfId] = useState(null);
   const [printingOrderId, setPrintingOrderId] = useState(null);
+  const [sendingEmailId, setSendingEmailId] = useState(null);
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -71,9 +73,6 @@ export default function SearchOrdersPage() {
                 return (
                   <div className="flex gap-1 items-center">
                     <PdfButton onClick={() => handleGeneratePdf(o.ord_id)} disabled={generatingPdfId === o.ord_id} />
-                    {generatingPdfId === o.ord_id && (
-                      <span className="text-xs text-blue-600 ml-2 animate-pulse">Generando PDF...</span>
-                    )}
                     <MailButton onClick={() => handleSendEmail(o.ord_id)} />
                     <PrintButton onClick={() => handlePrintOrder(o.ord_id)} disabled={printingOrderId === o.ord_id} />          
                   </div>
@@ -84,9 +83,6 @@ export default function SearchOrdersPage() {
                   <div className="flex gap-1 items-center">
                     <EditButton onClick={() => handleEditResult(o.ord_id)} />
                     <PdfButton onClick={() => handleGeneratePdf(o.ord_id)} disabled={generatingPdfId === o.ord_id} />
-                    {generatingPdfId === o.ord_id && (
-                      <span className="text-xs text-blue-600 ml-2 animate-pulse">Generando PDF...</span>
-                    )}
                   </div>
                 );
               }
@@ -95,9 +91,6 @@ export default function SearchOrdersPage() {
                 <div className="flex gap-1 items-center">
                   <EditButton onClick={() => handleEditResult(o.ord_id)} />
                   <PdfButton onClick={() => handleGeneratePdf(o.ord_id)} disabled={generatingPdfId === o.ord_id} />
-                  {generatingPdfId === o.ord_id && (
-                    <span className="text-xs text-blue-600 ml-2 animate-pulse">Generando PDF...</span>
-                  )}
                   <MailButton onClick={() => handleSendEmail(o.ord_id)} />
                   <PrintButton onClick={() => handlePrintOrder(o.ord_id)} disabled={printingOrderId === o.ord_id} />               
                 </div>
@@ -136,6 +129,7 @@ export default function SearchOrdersPage() {
 
   // Agregar función para enviar email
   const handleSendEmail = async (orderId) => {
+    setSendingEmailId(orderId);
     try {
       const response = await sendResultsOrderDB(orderId);
       toast.success(response.data.message || 'Correo enviado correctamente');
@@ -143,6 +137,8 @@ export default function SearchOrdersPage() {
       const msg = error?.response?.data?.message;
       const errorMsg = Array.isArray(msg) ? msg[0] : (msg || 'Error enviando correo');
       toast.error(errorMsg);
+    } finally {
+      setSendingEmailId(null);
     }
   };
 
@@ -169,19 +165,24 @@ export default function SearchOrdersPage() {
   return (
     <LayoutDashboard>
       <CardWithTitle title="Buscar Órdenes de Laboratorio">
-        <div className="flex gap-2 mb-4">
-          <MuiInput
-            name="search"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            placeholder="Buscar por documento"
-            className="w-64 max-w-xs"
-          />
-          <div className="mt-0">
-             <CreateButton title="Buscar" onClick={handleSearch} />
+        {(generatingPdfId || sendingEmailId) && (
+          <MuiModalLoader text={generatingPdfId ? "Generando PDF..." : "Enviando correo..."} />
+        )}
+        <div className="flex flex-col gap-2 mb-4">
+          {/* Loader ahora es modal, no aquí */}
+          <div className="flex gap-2">
+            <MuiInput
+              name="search"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              placeholder="Buscar por documento"
+              className="w-64 max-w-xs"
+            />
+            <div className="mt-0">
+              <CreateButton title="Buscar" onClick={handleSearch} />
+            </div>
           </div>
-         
         </div>
         <MuiTable columns={columns} data={orders} />
       </CardWithTitle>
