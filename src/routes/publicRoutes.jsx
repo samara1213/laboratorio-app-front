@@ -7,7 +7,13 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 export function PublicRoute() {
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
-  return !isAuthenticated ? <Outlet /> : <Navigate to="/dashboard" replace />;
+  return !isAuthenticated ? (
+    <div className="public-layout">
+      <Outlet />
+    </div>
+  ) : (
+    <Navigate to="/dashboard" replace />
+  );
 }
 
 const publicRoutes = [

@@ -18,7 +18,13 @@ import AdminUserPage from '../components/pages/users/AdminUserPage';
 
 export function PrivateRoute() {
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
-  return isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
+  return isAuthenticated ? (
+    <div className="private-layout">
+      <Outlet />
+    </div>
+  ) : (
+    <Navigate to="/" replace />
+  );
 }
 
 const privateRoutes = [
