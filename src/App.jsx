@@ -8,10 +8,12 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const router = createBrowserRouter([
 	{
+		path: '/',
 		element: <PublicRoute />,
 		children: publicRoutes,
 	},
 	{
+		path: '/',
 		element: <PrivateRoute />,
 		children: privateRoutes,
 	},
