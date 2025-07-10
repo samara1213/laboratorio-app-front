@@ -1,6 +1,5 @@
 // privateRoutes.jsx
 import Dashboard from '../components/Dashboard';
-import UsersPage from '../components/pages/users/usersPage';
 import LaboratoriesPage from '../components/pages/laboratories/LaboratoriesPage';
 import MenusPage from '../components/pages/menus/MenusPage';
 import RolesPage from '../components/pages/roles/RolesPage';
@@ -15,6 +14,7 @@ import EditResultPage from '../components/pages/results/EditResultPage';
 import SearchOrdersPage from '../components/pages/orders/SearchOrdersPage';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
+import AdminUserPage from '../components/pages/users/AdminUserPage';
 
 export function PrivateRoute() {
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
@@ -28,7 +28,7 @@ const privateRoutes = [
   },
   {
     path: '/users',
-    element: <UsersPage />,
+    element: <AdminUserPage />,
   },
   {
     path: '/laboratories',

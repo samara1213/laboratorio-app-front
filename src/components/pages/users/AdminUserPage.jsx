@@ -9,7 +9,7 @@ import CreateButton from '../../mui/CreateButton';
 import CreateUserModal from './CreateUserModal';
 import EditUserModal from './EditUserModal';
 
-const UsersPage = () => {
+const AdminUserPage = () => {
   const [laboratories, setLaboratories] = useState([]);
   const [selectedLab, setSelectedLab] = useState('');
   const [users, setUsers] = useState([]);
@@ -143,4 +143,4 @@ const UsersPage = () => {
   );
 }
 
-export default UsersPage;
+export default AdminUserPage;
