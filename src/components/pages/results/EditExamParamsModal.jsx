@@ -15,11 +15,12 @@ export default function EditExamParamsModal({ open, onClose, exam, orderId, onRe
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (exam && exam.parameters) {
-      setParams(prepareParamsData(exam.parameters));
-      setLoading(false);
-    }
-  }, [exam]);
+        if (exam && exam.parameters) {
+            const sortedParams = [...exam.parameters].sort((a, b) => (a.par_order ?? 0) - (b.par_order ?? 0));
+            setParams(prepareParamsData(sortedParams));
+            setLoading(false);
+        }
+    }, [exam]);
 
   function prepareParamsData(parameters) {
     return parameters.map(param => ({

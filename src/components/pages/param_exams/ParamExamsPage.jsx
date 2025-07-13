@@ -56,12 +56,14 @@ export default function ParamExamsPage() {
         setLoading(true);
         try {
             const response = await getAllParamExamsDB(selectedExam);
-            const paramsData = (response.data.data || []).map(param => ({
-                ...param,
-                accion: (
-                    <EditButton onClick={() => handleEdit(param)} />
-                )
-            }));
+            const paramsData = (response.data.data || [])
+                .sort((a, b) => (a.par_order ?? 0) - (b.par_order ?? 0))
+                .map(param => ({
+                    ...param,
+                    accion: (
+                        <EditButton onClick={() => handleEdit(param)} />
+                    )
+                }));
             setParams(paramsData);
         } catch {
             setParams([]);
