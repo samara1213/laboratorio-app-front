@@ -29,7 +29,8 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                 par_max_man: +data.par_max_man || null,
                 par_min_man: +data.par_min_man || null,
                 par_min_woman: +data.par_min_woman || null,
-                par_max_woman: +data.par_max_woman || null 
+                par_max_woman: +data.par_max_woman || null ,
+                par_order: +data.par_order || null
             };            
             const response = await onSave(payload);
             toast.success(response?.data?.message || 'Parámetro creado correctamente');
@@ -144,6 +145,14 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                             className="w-full"
                         />
                     </div>
+                    <MuiInput
+                        label="Orden del parámetro"
+                        name="par_order"
+                        type="number"
+                        {...register('par_order', { required: 'El orden es obligatorio', min: 1 })}
+                        error={errors.par_order?.message}
+                        className="w-full"
+                    />
                     <div className="flex justify-end gap-2 sm:col-span-2 sticky bottom-0 bg-blue-50/80 pt-2 pb-1 z-10">
                         <CreateButton type="submit" title="Crear" />
                         <CancelButton onClick={handleClose} />
