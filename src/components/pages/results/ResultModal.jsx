@@ -83,7 +83,13 @@ export default function ResultModal({ open, exam, onClose }) {
         <form onSubmit={onSubmit} className="mt-6">
           <MuiTable
             columns={paramColumns}
-            data={getParamTableData(exam.parameters, completedExams, exam, paramResults, setParamResults)}
+            data={getParamTableData(
+              [...(exam.parameters || [])].sort((a, b) => (a.par_order ?? 0) - (b.par_order ?? 0)),
+              completedExams,
+              exam,
+              paramResults,
+              setParamResults
+            )}
           />
           <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">Observaciones</label>
           <input
