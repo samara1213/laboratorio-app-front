@@ -102,6 +102,7 @@ export default function ParamExamsPage() {
     };
 
     const columns = [
+        { key: 'par_order', label: 'Orden del parámetro' },
         { key: 'par_name', label: 'Nombre del parámetro' },
         { key: 'par_default_value', label: 'Valor por defecto' },
         { key: 'par_state', label: 'Estado' },
