@@ -81,6 +81,7 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                                     label="Mínimo hombre"
                                     name="par_min_man"
                                     type="number"
+                                    step="any"
                                     {...register('par_min_man', { required: aplicaRango ? 'El mínimo para hombre es obligatorio' : false })}
                                     error={errors.par_min_man?.message}
                                     className="w-full"
@@ -89,6 +90,7 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                                     label="Máximo hombre"
                                     name="par_max_man"
                                     type="number"
+                                    step="any"
                                     {...register('par_max_man', { required: aplicaRango ? 'El máximo para hombre es obligatorio' : false })}
                                     error={errors.par_max_man?.message}
                                     className="w-full"
@@ -97,6 +99,7 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                                     label="Mínimo mujer"
                                     name="par_min_woman"
                                     type="number"
+                                    step="any"
                                     {...register('par_min_woman', { required: aplicaRango ? 'El mínimo para mujer es obligatorio' : false })}
                                     error={errors.par_min_woman?.message}
                                     className="w-full"
@@ -105,6 +108,7 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                                     label="Máximo mujer"
                                     name="par_max_woman"
                                     type="number"
+                                    step="any"
                                     {...register('par_max_woman', { required: aplicaRango ? 'El máximo para mujer es obligatorio' : false })}
                                     error={errors.par_max_woman?.message}
                                     className="w-full"
@@ -113,6 +117,7 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                                     label="Mínimo niño"
                                     name="par_min_child"
                                     type="number"
+                                    step="any"
                                     {...register('par_min_child', { required: aplicaRango ? 'El mínimo para niño es obligatorio' : false })}
                                     error={errors.par_min_child?.message}
                                     className="w-full"
@@ -121,6 +126,7 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                                     label="Máximo niño"
                                     name="par_max_child"
                                     type="number"
+                                    step="any"
                                     {...register('par_max_child', { required: aplicaRango ? 'El máximo para niño es obligatorio' : false })}
                                     error={errors.par_max_child?.message}
                                     className="w-full"
@@ -149,6 +155,7 @@ export default function CreateParamExamModal({ open, onClose, onSubmit: onSave, 
                         label="Orden del parámetro"
                         name="par_order"
                         type="number"
+                        step="any"
                         {...register('par_order', { required: 'El orden es obligatorio', min: 1 })}
                         error={errors.par_order?.message}
                         className="w-full"
