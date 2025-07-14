@@ -2,7 +2,7 @@ import LayoutDashboard from './dashboard/LayoutDashboard';
 import CardWithTitle from './CardWithTitle';
 import MuiTable from './mui/MuiTable';
 import { useEffect, useState } from 'react';
-import { getOrdersByStatusDB, deleteOrderDB, getOrderByIdDB } from '../services/orderService';
+import { getOrdersByStatusDB, deleteOrderDB, getOrderByIdDB, changeStatusOrderDB, uploadFile } from '../services';
 import { useAuthStore } from '../hooks/authStore';
 import EditButton from './mui/EditButton';
 import DeleteButton from './mui/MuiDeleteButton';
@@ -11,6 +11,9 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import PreviewButton from './mui/PreviewButton';
 import PreviewExamsModal from './dashboard/PreviewExamsModal';
+import UploadButton from './mui/UploadButton';
+import MuiFileUploadModal from './mui/MuiFileUploadModal';
+
 
 const columns = [
   { key: 'ord_code', label: 'N° Orden' },
@@ -29,19 +32,23 @@ function Dashboard() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [orderToPreview, setOrderToPreview] = useState(null);
   const [loadingPreview, setLoadingPreview] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [orderToUpload, setOrderToUpload] = useState(null);
   const navigate = useNavigate();
 
   const fetchOrders = async () => {
     if (!user?.laboratory?.lab_id) return;
     try {
       // Obtener órdenes PENDIENTE y PROCESANDO
-      const [pendRes, procRes] = await Promise.all([
+      const [pendRes, procRes, adjRes] = await Promise.all([
         getOrdersByStatusDB({ lab_id: user.laboratory.lab_id, ord_status: 'PENDIENTE' }),
-        getOrdersByStatusDB({ lab_id: user.laboratory.lab_id, ord_status: 'PROCESANDO' })
+        getOrdersByStatusDB({ lab_id: user.laboratory.lab_id, ord_status: 'PROCESANDO' }),
+        getOrdersByStatusDB({ lab_id: user.laboratory.lab_id, ord_status: 'ORDEN CON ADJUNTO' })
       ]);
       const pendData = pendRes.data.data || [];
       const procData = procRes.data.data || [];
-      const allOrders = [...pendData, ...procData];
+      const adjData = adjRes.data.data || [];
+      const allOrders = [...pendData, ...procData, ...adjData];
       const data = allOrders.map(order => ({
         ...order,
         cus_document_number: order.customer?.cus_document_number || '',
@@ -63,6 +70,7 @@ function Dashboard() {
           <div className="flex gap-2">
             <EditButton onClick={() => navigate(`/results/${order.ord_id}`)} />
             <PreviewButton onClick={() => handlePreview(order)} />
+            <UploadButton onClick={() => handleUploadClick(order)} />
             <DeleteButton onClick={() => handleDelete(order)} />
           </div>
         ),
@@ -120,6 +128,25 @@ function Dashboard() {
     await fetchOrders();
   };
 
+  const handleUploadClick = (order) => {
+    setOrderToUpload(order);
+    setUploadOpen(true);
+  };
+
+  const handleFileUpload = async (file) => {
+    try {
+      const response = await uploadFile(file, orderToUpload?.ord_id);
+      await changeStatusOrderDB({ ord_id: orderToUpload?.ord_id, ord_status: 'ORDEN CON ADJUNTO' });
+      toast.success(response?.data?.message || 'Archivo cargado correctamente');
+      await fetchOrders();
+    } catch (error) {
+      toast.error(response?.data?.message || 'Error al cargar el archivo');
+    } finally {
+      setUploadOpen(false);
+      setOrderToUpload(null);
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -128,6 +155,13 @@ function Dashboard() {
     <LayoutDashboard>
       <CardWithTitle title="Órdenes pendientes">
         <MuiTable columns={columns} data={orders} />
+        <MuiFileUploadModal
+          open={uploadOpen}
+          onClose={() => setUploadOpen(false)}
+          onUpload={handleFileUpload}
+          loading={false}
+          title="Cargar archivo de orden"
+        />
         <PreviewExamsModal open={previewOpen} onClose={handleClosePreview} order={orderToPreview} loading={loadingPreview} />
         <ConfirmDialog
           open={confirmOpen}
