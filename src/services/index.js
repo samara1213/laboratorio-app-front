@@ -8,6 +8,7 @@ export { getAllParamExamsDB, createParamExamDB, updateParamExamDB } from './para
 export { createCustomerDB, searchCustomerByDocumentDB, updateCustomerDB } from './customerService';
 export { createOrderDB, getOrdersByStatusDB, deleteOrderDB, getOrderByIdDB, 
          getOrdersByCustomerIdDB, getResultsByOrderIdDB, generatePdfOrderDB,
-         sendResultsOrderDB, getUrlPrefirredOrderDB } from './orderService';
+         sendResultsOrderDB, getUrlPrefirredOrderDB, changeStatusOrderDB } from './orderService';
 export { createResultDB, updateResultExamDB } from './resultService';
 export { getAllUsersDB, updateUserDB, createUserDB } from './userService';
+export { uploadFile } from './attached';
