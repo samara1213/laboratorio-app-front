@@ -64,9 +64,8 @@ const AdminUserPage = () => {
     refreshUsers();    
   }, [selectedLab]);
 
-  const handleCreateUser = async (userData) => {
-    setCreatingUser(true);
-    setCreateError(null);
+  const handleCreateUser = async (userData) => {   
+    
     try {
       const response = await createUserDB(userData);
       setOpenCreateModal(false);      
@@ -75,7 +74,7 @@ const AdminUserPage = () => {
     } catch (err) {
       throw err;
     } finally {
-      setCreatingUser(false);
+      console.log('User created successfully');
     }
   };
 
