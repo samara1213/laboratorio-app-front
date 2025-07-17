@@ -47,7 +47,7 @@ export default function CreateUserModal({ open, onClose, onUserCreated, laborato
     try {
         const response = await onUserCreated(data);
         toast.success(response?.data?.message || 'Usuario creado correctamente');
-    } catch (error) {        
+    } catch (error) {             
         const msg = error?.response?.data?.message;
         const errorMsg = Array.isArray(msg) ? msg[0] : (msg || 'Error buscando exámenes');
         toast.error(errorMsg);        
