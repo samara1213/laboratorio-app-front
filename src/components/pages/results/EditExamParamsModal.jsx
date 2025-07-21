@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 export default function EditExamParamsModal({ open, onClose, exam, orderId, onRefresh }) {
   const [params, setParams] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
         if (exam && exam.parameters) {
             const sortedParams = [...exam.parameters].sort((a, b) => (a.par_order ?? 0) - (b.par_order ?? 0));
@@ -46,7 +46,7 @@ export default function EditExamParamsModal({ open, onClose, exam, orderId, onRe
   const paramColumns = [
     { key: 'par_name', label: 'Nombre del parámetro' },
     { key: 'result', label: 'Resultado' },
-    { key: 'observation', label: 'Observacion' },
+    { key: 'reference', label: 'Valor de referencia' },
     { key: 'accion', label: 'Acciones' },
 ];
 
@@ -60,11 +60,11 @@ export default function EditExamParamsModal({ open, onClose, exam, orderId, onRe
           onChange={e => handleChange(idx, { result: e.target.value })}
         />
       ),
-      observation: (
+      reference: (
         <MuiInput
           className="w-full"
-          value={param.observation || ''}
-          onChange={e => handleChange(idx, { observation: e.target.value })}
+          value={param.reference || ''}
+          onChange={e => handleChange(idx, { reference: e.target.value })}
         />
       ),
       accion: (
@@ -83,6 +83,7 @@ export default function EditExamParamsModal({ open, onClose, exam, orderId, onRe
         param: param.par_id,
         res_value: param.result,
         res_observation: param.observation,
+        res_reference: param.reference,
       });
       toast.success(response.data.message || 'Parámetro guardado correctamente');
     } catch (error) {

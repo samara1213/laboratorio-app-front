@@ -9,15 +9,24 @@ import CreateButton from '../../mui/CreateButton';
 
 const paramColumns = [
   { key: 'par_name', label: 'Nombre del parámetro' },
-  { key: 'par_unit_extent', label: 'Unidad medida' },
+  { key: 'reference', label: 'Valor de referencia' },
   { key: 'resultado', label: 'Resultado' },
 ];
 
 function getParamTableData(parameters, completedExams, exam, paramResults, setParamResults) {
   return (parameters || []).map(param => {
     const value = paramResults[param.par_id] ?? '';
+    const referenceValue = paramResults[`reference_${param.par_id}`] ?? '';
     return {
       ...param,
+      reference: (
+        <input
+          type="text"
+          className="w-full text-sm border rounded px-2 py-1"
+          value={referenceValue}
+          onChange={e => setParamResults(prev => ({ ...prev, [`reference_${param.par_id}`]: e.target.value }))}
+        />
+      ),
       resultado: (
         <input
           type="text"
@@ -42,6 +51,7 @@ export default function ResultModal({ open, exam, onClose }) {
       (exam.parameters || []).forEach(param => {
         const saved = (completedExams || []).find(r => r.exa_id === exam.exa_id && r.par_id === param.par_id);
         paramDefaults[param.par_id] = saved ? saved.resultado : param.par_default_value ?? '';
+        paramDefaults[`reference_${param.par_id}`] = saved && saved.reference !== undefined ? saved.reference : '';
       });
       setParamResults(paramDefaults);
       const savedObs = (completedExams || []).find(r => r.exa_id === exam.exa_id)?.observacion || '';
@@ -57,6 +67,7 @@ export default function ResultModal({ open, exam, onClose }) {
       exa_id: exam.exa_id,
       par_id: param.par_id,
       resultado: paramResults[param.par_id] ?? '',
+      reference: paramResults[`reference_${param.par_id}`] ?? '',
       observacion: observaciones || ''
     }));
     // Verificar si todos los parámetros tienen resultado (no vacío)
