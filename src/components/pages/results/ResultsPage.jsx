@@ -95,6 +95,7 @@ export default function ResultsPage() {
     const resultsToSend = completedExams.map(r => ({
       res_value: r.resultado,
       res_observation: r.observacion,
+      res_reference: r.reference,
       order: order.ord_id,
       exam: r.exa_id,
       param: r.par_id

@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import UploadButton from '../../mui/UploadButton';
+import MuiFileUploadModal from '../../mui/MuiFileUploadModal';
+import { uploadFile } from '../../../services/attached';
 import CardWithTitle from '../../CardWithTitle';
 import LayoutDashboard from '../../dashboard/LayoutDashboard';
 import MuiTable from '../../mui/MuiTable';
@@ -29,9 +32,30 @@ export default function SearchOrdersPage() {
   const [generatingPdfId, setGeneratingPdfId] = useState(null);
   const [printingOrderId, setPrintingOrderId] = useState(null);
   const [sendingEmailId, setSendingEmailId] = useState(null);
+  const [uploadingOrderId, setUploadingOrderId] = useState(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
+  // Handler para subir archivo
+  const handleUploadFile = async (file) => {
+    if (!selectedOrderId) return;
+    setUploadingOrderId(selectedOrderId);
+    try {
+      const response = await uploadFile(file, selectedOrderId);
+      toast.success(response?.data?.message || 'Archivo cargado correctamente');
+      setShowUploadModal(false);
+      setSelectedOrderId(null);
+      await handleSearch(); // Refresca la tabla
+    } catch (error) {
+      const msg = error?.response?.data?.message;
+      const errorMsg = Array.isArray(msg) ? msg[0] : (msg || 'Error cargando archivo');
+      toast.error(errorMsg);
+    } finally {
+      setUploadingOrderId(null);
+    }
+  };
   const handleSearch = async () => {
     setLoading(true);
     try {
@@ -72,9 +96,12 @@ export default function SearchOrdersPage() {
               if (status === 'FINALIZADA') {
                 return (
                   <div className="flex gap-1 items-center">
+                    <EditButton onClick={() => handleEditResult(o.ord_id)} />
+                    <UploadButton onClick={() => { setSelectedOrderId(o.ord_id); setShowUploadModal(true); }} />
                     <PdfButton onClick={() => handleGeneratePdf(o.ord_id)} disabled={generatingPdfId === o.ord_id} />
                     <MailButton onClick={() => handleSendEmail(o.ord_id)} />
-                    <PrintButton onClick={() => handlePrintOrder(o.ord_id)} disabled={printingOrderId === o.ord_id} />          
+                    <PrintButton onClick={() => handlePrintOrder(o.ord_id)} disabled={printingOrderId === o.ord_id} />
+                    
                   </div>
                 );
               }
@@ -82,7 +109,8 @@ export default function SearchOrdersPage() {
                 return (
                   <div className="flex gap-1 items-center">
                     <EditButton onClick={() => handleEditResult(o.ord_id)} />
-                    <PdfButton onClick={() => handleGeneratePdf(o.ord_id)} disabled={generatingPdfId === o.ord_id} />
+                    <UploadButton onClick={() => { setSelectedOrderId(o.ord_id); setShowUploadModal(true); }} />
+                    <PdfButton onClick={() => handleGeneratePdf(o.ord_id)} disabled={generatingPdfId === o.ord_id} />                    
                   </div>
                 );
               }
@@ -90,6 +118,7 @@ export default function SearchOrdersPage() {
               return (
                 <div className="flex gap-1 items-center">
                   <EditButton onClick={() => handleEditResult(o.ord_id)} />
+                  <UploadButton onClick={() => { setSelectedOrderId(o.ord_id); setShowUploadModal(true); }} />
                   <PdfButton onClick={() => handleGeneratePdf(o.ord_id)} disabled={generatingPdfId === o.ord_id} />
                   <MailButton onClick={() => handleSendEmail(o.ord_id)} />
                   <PrintButton onClick={() => handlePrintOrder(o.ord_id)} disabled={printingOrderId === o.ord_id} />               
@@ -97,7 +126,7 @@ export default function SearchOrdersPage() {
               );
             })()
           ),
-        };
+        };  
       });
       setOrders(formattedOrders);
     } catch {
@@ -166,7 +195,7 @@ export default function SearchOrdersPage() {
     <LayoutDashboard>
       <CardWithTitle title="Buscar Órdenes de Laboratorio">
         {(generatingPdfId || sendingEmailId) && (
-          <MuiModalLoader text={generatingPdfId ? "Generando PDF..." : "Enviando correo..."} />
+          <MuiModalLoader text={generatingPdfId ? "Generando PDF..."  : "Enviando correo..."} />
         )}
         <div className="flex flex-col gap-2 mb-4">
           {/* Loader ahora es modal, no aquí */}
@@ -185,6 +214,13 @@ export default function SearchOrdersPage() {
           </div>
         </div>
         <MuiTable columns={columns} data={orders} />
+        <MuiFileUploadModal
+          open={showUploadModal}
+          onClose={() => { setShowUploadModal(false); setSelectedOrderId(null); }}
+          onUpload={handleUploadFile}
+          loading={false}
+          title="Cargar archivo adjunto"
+        />
       </CardWithTitle>
     </LayoutDashboard>
   );

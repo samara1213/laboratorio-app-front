@@ -107,6 +107,7 @@ export default function MuiTable({ columns = [], data = [], className = '' }) {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-2">
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={handlePrev}
             disabled={page === 1}
             className="px-3 py-1 rounded bg-[#232A34] text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
@@ -117,6 +118,7 @@ export default function MuiTable({ columns = [], data = [], className = '' }) {
             Página {page} de {totalPages}
           </span>
           <button
+            type="button"
             onClick={handleNext}
             disabled={page === totalPages}
             className="px-3 py-1 rounded bg-[#232A34] text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
