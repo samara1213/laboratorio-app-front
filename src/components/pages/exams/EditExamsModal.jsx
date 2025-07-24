@@ -22,7 +22,8 @@ export default function EditExamsModal({
     ...defaultValues,
     alliance: typeof defaultValues?.alliance === 'object' && defaultValues?.alliance !== null
       ? defaultValues.alliance.ali_id
-      : defaultValues?.alliance || ''
+      : defaultValues?.alliance || '',
+    exa_classification: defaultValues?.exa_classification ? String(defaultValues.exa_classification) : '',
   };
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
@@ -43,18 +44,16 @@ export default function EditExamsModal({
 
   const onSubmit = async (data) => {
     try {
-
       const dataToSend = {
         exa_name: data.exa_name,
         exa_description: data.exa_description,
         exa_price: data.exa_price,
-        alliance: data.alliance || null
+        alliance: data.alliance || null,
+        exa_classification: data.exa_classification || '',
       };
-
       const response = await onSave(dataToSend);
       reset();
       toast.success(response?.data?.message || 'Examen actualizado correctamente');
-
     } catch (error) {
       const msg = error?.response?.data?.message;
       const errorMsg = Array.isArray(msg) ? msg[0] : (msg || 'Error al actualizar el examen');
@@ -92,6 +91,25 @@ export default function EditExamsModal({
             error={errors.exa_price?.message}
             className="w-full mb-1"
           />
+          <div className="sm:col-span-2">
+            <MuiSelect
+              label="Clasificación del examen"
+              name="exa_classification"
+              {...register('exa_classification', { required: 'La clasificación es obligatoria' })}
+              error={errors.exa_classification?.message}
+              className="w-full mb-1"
+            >
+              <option value="">Seleccione clasificación</option>
+              <option value="1">Imagen hemograma</option>
+              <option value="2">Hematología</option>
+              <option value="3">Química</option>
+              <option value="4">Inmunología</option>
+              <option value="5">Microscopía</option>
+              <option value="6">Macroscopia</option>
+              <option value="7">Microbiología</option>
+              <option value="8">Hormonas</option>
+            </MuiSelect>
+          </div>
           <div className="sm:col-span-2">
             {!showAllianceSelect ? (
               <button

@@ -18,7 +18,10 @@ export default function CreateExamsModal({
   defaultValues = {}
 }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
-    defaultValues
+    defaultValues: {
+      exa_classification: '',
+      ...defaultValues
+    }
   });
   const [showAllianceSelect, setShowAllianceSelect] = useState(!!defaultValues.alliance);
 
@@ -70,6 +73,25 @@ export default function CreateExamsModal({
             error={errors.exa_price?.message}
             className="w-full mb-1"
           />
+          <div className="sm:col-span-2">
+            <MuiSelect
+              label="Clasificación del examen"
+              name="exa_classification"
+              {...register('exa_classification', { required: 'La clasificación es obligatoria' })}
+              error={errors.exa_classification?.message}
+              className="w-full mb-1"
+            >
+              <option value="">Seleccione clasificación</option>
+              <option value="1">Imagen hemograma</option>
+              <option value="2">Hematología</option>
+              <option value="3">Química</option>
+              <option value="4">Inmunología</option>
+              <option value="5">Microscopía</option>
+              <option value="6">Macroscopia</option>
+              <option value="7">Microbiología</option>
+              <option value="8">Hormonas</option>
+            </MuiSelect>
+          </div>
           <div className="sm:col-span-2">
             {!showAllianceSelect ? (
               <button
