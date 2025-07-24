@@ -24,8 +24,19 @@ export default function ExamsPage() {
     try {
       const lab_id = user.laboratory.lab_id;
       const response = await getAllExamsDB(lab_id);
+      const classificationNames = {
+        '1': 'Imagen hemograma',
+        '2': 'Hematología',
+        '3': 'Química',
+        '4': 'Inmunología',
+        '5': 'Microscopía',
+        '6': 'Macroscopia',
+        '7': 'Microbiología',
+        '8': 'Hormonas',
+      };
       const data = (response.data.data || []).map((exam) => ({
         ...exam,
+        exa_classification: classificationNames[String(exam.exa_classification)] || '',
         aliado: exam.alliance ? exam.alliance.ali_nombre : '',
         accion: <EditButton onClick={() => handleEdit(exam)} />,
       }));   
@@ -55,6 +66,7 @@ export default function ExamsPage() {
   const columns = [
     { key: 'exa_name', label: 'Nombre del examen' },
     { key: 'exa_description', label: 'Descripcion' },
+    { key: 'exa_classification', label: 'Grupo' },
     { key: 'exa_price', label: 'Precio' },
     { key: 'aliado', label: 'Aliado' },
     { key: 'accion', label: 'Acciones' },
