@@ -1,6 +1,7 @@
 // hooks/authStore.js
 import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess, logout } from '../store/authSlice';
+import { queryClient } from '../lib/query-client';
 
 export function useAuthStore() {
   const dispatch = useDispatch();
@@ -15,7 +16,9 @@ export function useAuthStore() {
 
   const startLogout = () => {
     dispatch(logout());
-    localStorage.clear();
+    // el reducer logout ya borra la sesión; se conservan preferencias como el tema.
+    // se vacía la caché para que el siguiente usuario no vea datos del anterior
+    queryClient.clear();
   };
 
   return {

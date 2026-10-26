@@ -1,53 +1,62 @@
-import MuiModal from './MuiModal';
-import CardWithTitle from '../CardWithTitle';
-import MuiInput from './MuiInput';
-import CancelButton from './CancelButton';
-import CreateButton from './CreateButton';
 import { useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Field, Input } from '@/components/ui/field';
 
-export default function MuiFileUploadModal({ open, onClose, onUpload, loading = false, title = 'Cargar archivo', accept = '*' }) {
-  const fileInputRef = useRef();
+// tipos que acepta el backend para los adjuntos de una orden
+const DEFAULT_ACCEPT = 'application/pdf,image/png,image/jpeg,image/gif,image/webp,image/bmp';
+
+/**
+ * Diálogo para adjuntar un archivo (PDF o imagen; en celular y tablet permite usar la cámara)
+ * Props: open, onClose, onUpload(file), loading, title, accept
+ */
+export default function MuiFileUploadModal({ open, onClose, onUpload, loading = false, title = 'Adjuntar archivo', accept = DEFAULT_ACCEPT }) {
+  const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0] || null);
+  const reset = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleCancel = () => {
+    reset();
+    onClose();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (selectedFile && onUpload) {
-      onUpload(selectedFile);
-    }
-  };
-
-  const handleCancel = () => {
-    setSelectedFile(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    onClose();
+    if (selectedFile && onUpload) onUpload(selectedFile);
   };
 
   return (
-    <MuiModal open={open} onClose={handleCancel} maxWidth="max-w-md">
-      <CardWithTitle title={title} loading={loading}>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-2">
-          <MuiInput
-            label="Selecciona un archivo"
-            name="file"
-            type="file"
-            accept={accept}
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="w-full"
-          />
+    <Dialog open={open} onOpenChange={(value) => !value && handleCancel()}>
+      <DialogContent
+        size="md"
+        title={title}
+        description="PDF o imagen de máximo 10 MB."
+        footer={
+          <>
+            <Button variant="secondary" onClick={handleCancel}>
+              Cancelar
+            </Button>
+            <Button type="submit" form="form-adjunto" disabled={!selectedFile || loading}>
+              {loading ? 'Subiendo…' : 'Subir archivo'}
+            </Button>
+          </>
+        }
+      >
+        <form id="form-adjunto" onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <Field label="Archivo">
+            {(field) => <Input type="file" accept={accept} ref={fileInputRef} onChange={(e) => setSelectedFile(e.target.files[0] || null)} {...field} />}
+          </Field>
           {selectedFile && (
-            <div className="text-sm text-blue-700 font-medium">Archivo seleccionado: {selectedFile.name}</div>
+            <p className="text-[15px] text-muted">
+              Seleccionado: <span className="font-semibold text-ink">{selectedFile.name}</span>
+            </p>
           )}
-          <div className="flex justify-end gap-2 mt-2">
-            <CreateButton type="submit" title="Subir" disabled={!selectedFile || loading} />
-            <CancelButton onClick={handleCancel} />
-          </div>
         </form>
-      </CardWithTitle>
-    </MuiModal>
+      </DialogContent>
+    </Dialog>
   );
 }

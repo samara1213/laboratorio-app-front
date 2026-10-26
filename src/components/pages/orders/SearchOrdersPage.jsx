@@ -14,7 +14,7 @@ import PdfButton from '../../mui/PdfButton';
 import MailButton from '../../mui/MailButton';
 import PrintButton from '../../mui/PrintButton';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import MuiModalLoader from '../../mui/MuiModalLoader';
 
 

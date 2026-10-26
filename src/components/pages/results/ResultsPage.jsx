@@ -9,7 +9,7 @@ import EditButton from '../../mui/EditButton';
 import ResultModal from './ResultModal';
 import { createResultDB } from '../../../services/resultService';
 import { changeStatusOrderDB } from '../../../services/orderService';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import CreateButton from '../../mui/CreateButton';
 import { useResultsActions } from '../../../hooks/resultsStore';
 
@@ -135,8 +135,8 @@ export default function ResultsPage() {
         {order && !loading && !error && (
           <>
             <div className="mb-6">
-              <div className="flex items-center gap-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl shadow p-4">
-                <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-blue-200 text-blue-700 text-xl font-bold shadow-inner">
+              <div className="flex items-center gap-4 bg-linear-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl shadow-sm p-4">
+                <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-blue-200 text-blue-700 text-xl font-bold shadow-inner">
                   <span>{order.customer?.cus_first_name?.[0] || ''}{order.customer?.cus_first_lastname?.[0] || ''}</span>
                 </div>
                 <div>
@@ -148,7 +148,7 @@ export default function ResultsPage() {
                   </div>
                   <div className="text-xs text-blue-500 flex items-center gap-4">
                     <span><b>Fecha de orden:</b> {order.ord_created_at}</span>
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-200 text-orange-900 border border-orange-400 shadow-sm">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-200 text-orange-900 border border-orange-400 shadow-xs">
                       <b>Estado:</b> {order.ord_status}
                     </span>
                   </div>

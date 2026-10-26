@@ -7,7 +7,7 @@ export default function OrderTotalsBox({ totals, discountPercent, setDiscountPer
       className="flex flex-col sm:flex-row items-center gap-6 mt-8 justify-end"
       key={`totalsbox-${subtotal}-${discountValue}-${total}`}
     >
-      <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-xl shadow-md p-6 w-full sm:w-auto min-w-[320px] max-w-md">
+      <div className="bg-linear-to-r from-blue-50 to-green-50 border border-blue-200 rounded-xl shadow-md p-6 w-full sm:w-auto min-w-[320px] max-w-md">
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-700">Subtotal</span>
@@ -33,7 +33,7 @@ export default function OrderTotalsBox({ totals, discountPercent, setDiscountPer
                     setDiscountPercent('0');
                   }
                 }}
-                className="w-16 border border-blue-200 rounded px-2 py-1 text-center focus:ring-2 focus:ring-blue-300 transition"
+                className="w-16 border border-blue-200 rounded-sm px-2 py-1 text-center focus:ring-2 focus:ring-blue-300 transition"
               />
               <span className="text-gray-500 font-medium">%</span>
             </div>

@@ -5,7 +5,7 @@ import CreateButton from '../../mui/CreateButton';
 import CancelButton from '../../mui/CancelButton';
 import MuiSelect from '../../mui/MuiSelect';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { Icon } from '@iconify/react';
 import { createCustomerDB } from '../../../services';
 import { useAuthStore } from '../../../hooks/authStore';

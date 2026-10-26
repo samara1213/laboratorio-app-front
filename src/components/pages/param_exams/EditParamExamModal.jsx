@@ -5,7 +5,7 @@ import MuiInput from '../../mui/MuiInput';
 import CancelButton from '../../mui/CancelButton';
 import CreateButton from '../../mui/CreateButton';
 import { useForm, useWatch } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import MuiCheck from '../../mui/MuiCheck';
 
 export default function EditParamExamModal({ open, onClose, onSubmit: onSave, loading = false, param, examId }) {
@@ -89,7 +89,7 @@ export default function EditParamExamModal({ open, onClose, onSubmit: onSave, lo
                     {/* Campos de rango, solo visibles y obligatorios si aplicaRango */}
                     {aplicaRango && (
                         <div className="sm:col-span-2 rounded-lg border-2 border-blue-400 bg-blue-50 p-4 flex flex-col gap-2 relative">
-                            <span className="absolute -top-3 left-4 bg-blue-400 text-white text-xs px-2 py-0.5 rounded shadow">Valores de rango</span>
+                            <span className="absolute -top-3 left-4 bg-blue-400 text-white text-xs px-2 py-0.5 rounded-sm shadow-sm">Valores de rango</span>
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <MuiInput
                                     label="Mínimo hombre"

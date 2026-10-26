@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getEnvVariables } from '../helpers/getEnvVariables';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 
 const { VITE_URL_API } = getEnvVariables();
@@ -29,7 +29,9 @@ laboratorioApi.interceptors.response.use(
         return response;
     },
     function (error) {
-        if (error.response && error.response.status === 401 && !isSessionExpired) {
+        // las rutas de autenticación responden 401 por credenciales incorrectas, no por sesión vencida
+        const isAuthRoute = /auth\/(login|changePassword)/.test(error.config?.url ?? '');
+        if (error.response && error.response.status === 401 && !isSessionExpired && !isAuthRoute) {
             isSessionExpired = true;
             localStorage.removeItem('auth');
             toast.info('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');

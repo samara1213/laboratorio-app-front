@@ -22,7 +22,7 @@ function getParamTableData(parameters, completedExams, exam, paramResults, setPa
       reference: (
         <input
           type="text"
-          className="w-full text-sm border rounded px-2 py-1"
+          className="w-full text-sm border rounded-sm px-2 py-1"
           value={referenceValue}
           onChange={e => setParamResults(prev => ({ ...prev, [`reference_${param.par_id}`]: e.target.value }))}
         />
@@ -30,7 +30,7 @@ function getParamTableData(parameters, completedExams, exam, paramResults, setPa
       resultado: (
         <input
           type="text"
-          className="w-full text-sm border rounded px-2 py-1"
+          className="w-full text-sm border rounded-sm px-2 py-1"
           value={value}
           onChange={e => setParamResults(prev => ({ ...prev, [param.par_id]: e.target.value }))}
         />
@@ -105,7 +105,7 @@ export default function ResultModal({ open, exam, onClose }) {
           <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">Observaciones</label>
           <input
             type="text"
-            className="w-full mb-4 border rounded px-2 py-1"
+            className="w-full mb-4 border rounded-sm px-2 py-1"
             value={observaciones}
             onChange={e => setObservaciones(e.target.value)}
             placeholder="Observaciones generales del examen"
@@ -115,12 +115,12 @@ export default function ResultModal({ open, exam, onClose }) {
               type="button"
               onClick={onClose}
               title="Cancelar"
-              className="!px-4 !py-2 !text-base sm:!text-sm"
+              className="px-4! py-2! text-base! sm:text-sm!"
             />
             <CreateButton
               type="submit"
               title="Guardar"
-              className="!px-4 !py-2 !text-base sm:!text-sm bg-blue-600 hover:bg-blue-700 text-white"
+              className="px-4! py-2! text-base! sm:text-sm! bg-blue-600 hover:bg-blue-700 text-white"
             />
           </div>
         </form>

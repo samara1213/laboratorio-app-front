@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import CardWithTitle from '../../CardWithTitle';
 import { searchCustomerByDocumentDB, getAllExamsDB, createOrderDB } from '../../../services';
 import { useAuthStore } from '../../../hooks/authStore';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import MuiSelect from '../../mui/MuiSelect';
 import MuiTable from '../../mui/MuiTable';
@@ -101,7 +101,7 @@ export default function CreateOrderPage() {
         if (!exam) return;
         // Evitar duplicados
         if (orderExams.some(e => e.exa_id === exam.exa_id)) {
-            toast.warn('El examen ya está agregado');
+            toast.warning('El examen ya está agregado');
             return;
         }
         setOrderExams([
@@ -167,7 +167,7 @@ export default function CreateOrderPage() {
             <div className="flex items-center justify-center gap-2">
                 <button
                     type="button"
-                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 font-bold"
+                    className="px-2 py-1 bg-gray-200 rounded-sm hover:bg-gray-300 font-bold"
                     onClick={() => handleChangeQuantity(row.exa_id, row.quantity - 1)}
                     disabled={row.quantity <= 1}
                     aria-label="Disminuir cantidad"
@@ -177,12 +177,12 @@ export default function CreateOrderPage() {
                     min="1"
                     value={row.quantity}
                     onChange={e => handleChangeQuantity(row.exa_id, e.target.value)}
-                    className="w-12 border rounded px-2 py-1 text-center"
+                    className="w-12 border rounded-sm px-2 py-1 text-center"
                     aria-label="Cantidad"
                 />
                 <button
                     type="button"
-                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 font-bold"
+                    className="px-2 py-1 bg-gray-200 rounded-sm hover:bg-gray-300 font-bold"
                     onClick={() => handleChangeQuantity(row.exa_id, row.quantity + 1)}
                     aria-label="Aumentar cantidad"
                 >+</button>
@@ -200,7 +200,7 @@ export default function CreateOrderPage() {
         <LayoutDashboard>
             <div className="p-6">
                 <CardWithTitle title="Crear Orden de Laboratorio">
-                    <div className="bg-white rounded-lg shadow p-6 min-h-[300px]">
+                    <div className="bg-white rounded-lg shadow-sm p-6 min-h-[300px]">
                         {/* Mostrar input y botón de buscar solo si no hay cliente seleccionado */}
                         {!showOrderSection && !showCreatePrompt && (
                             <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center gap-4 mb-6">

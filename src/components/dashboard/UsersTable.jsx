@@ -30,7 +30,7 @@ const data = users.map(user => ({
 
 export default function UsersTable() {
   return (
-    <div className="bg-white rounded-xl shadow p-6">
+    <div className="bg-white rounded-xl shadow-sm p-6">
       <h2 className="text-xl font-bold mb-4 text-[#29313B]">Table</h2>
       <MuiTable columns={columns} data={data} />
     </div>

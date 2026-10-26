@@ -1,3 +1,133 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import '@fontsource-variable/atkinson-hyperlegible-next';
+
+/* modo oscuro por clase en <html> (lo aplica src/lib/theme.js) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Tokens del sistema visual (aprobado en el lienzo de diseño):
+  colores de tinciones histológicas y estados con el color de las tapas de los tubos.
+  Las clases usan los nombres semánticos (bg-surface, text-muted, bg-primary...),
+  nunca colores sueltos.
+*/
+@theme {
+  --font-sans: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
+
+  --color-ground: #f4f6f8;
+  --color-surface: #ffffff;
+  --color-ink: #1b2433;
+  --color-muted: #4a5468;
+  --color-border: #dde2e8;
+  --color-border-strong: #c5ccd6;
+  --color-primary: #34408c;
+  --color-primary-hover: #2a3373;
+  --color-on-primary: #ffffff;
+  --color-tint: #e8eaf6;
+  --color-accent: #d9467a;
+  --color-danger: #c2362f;
+  --color-danger-hover: #a12a24;
+  --color-danger-ink: #a12a24;
+  --color-overlay: rgb(27 36 51 / 0.45);
+
+  /* estados de orden: tapa (punto), fondo y texto del chip */
+  --color-cap-pend: #d9a520;
+  --color-chip-pend: #fbf2d3;
+  --color-chip-pend-ink: #6a4c00;
+  --color-cap-proc: #8f6bd0;
+  --color-chip-proc: #eee8fa;
+  --color-chip-proc-ink: #4a2f86;
+  --color-cap-adj: #3e9bd6;
+  --color-chip-adj: #e3f1fa;
+  --color-chip-adj-ink: #12557f;
+  --color-cap-pdf: #dd6b20;
+  --color-chip-pdf: #fce9da;
+  --color-chip-pdf-ink: #7a3510;
+  --color-cap-fin: #2e9e6a;
+  --color-chip-fin: #e1f4ea;
+  --color-chip-fin-ink: #155c3b;
+  --color-cap-cancel: #8a94a3;
+  --color-chip-cancel: #edeff2;
+  --color-chip-cancel-ink: #3e4652;
+
+  --radius-control: 6px;
+  --radius-panel: 10px;
+
+  --animate-fade-in: fade-in 160ms ease-out;
+  --animate-slide-in: slide-in 200ms ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-in {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+  }
+}
+
+/* modo oscuro: mismos nombres, valores derivados de la hematoxilina */
+.dark {
+  --color-ground: #141a2a;
+  --color-surface: #1c2336;
+  --color-ink: #e8ebf3;
+  --color-muted: #a3acbf;
+  --color-border: #2e3752;
+  --color-border-strong: #45507a;
+  --color-primary: #8c98e8;
+  --color-primary-hover: #a5afee;
+  --color-on-primary: #141a2a;
+  --color-tint: #2a3260;
+  --color-danger: #e0645d;
+  --color-danger-hover: #ea827c;
+  --color-danger-ink: #f0a19c;
+  --color-chip-pend: #3a3220;
+  --color-chip-pend-ink: #f3dc9a;
+  --color-chip-proc: #2f2a48;
+  --color-chip-proc-ink: #d6c8f5;
+  --color-chip-adj: #1e3446;
+  --color-chip-adj-ink: #b9def5;
+  --color-chip-pdf: #3d2a1d;
+  --color-chip-pdf-ink: #f7c7a3;
+  --color-chip-fin: #1c3529;
+  --color-chip-fin-ink: #a9e3c5;
+  --color-chip-cancel: #2a303d;
+  --color-chip-cancel-ink: #cdd2db;
+  color-scheme: dark;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ground text-ink font-sans antialiased;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* foco visible con teclado en todos los controles */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}

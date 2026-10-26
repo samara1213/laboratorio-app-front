@@ -5,7 +5,7 @@ import CancelButton from '../../mui/CancelButton';
 import CardWithTitle from '../../CardWithTitle';
 import { useForm } from 'react-hook-form';
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 export default function EditAllianceModal({ open, onSave, onClose, initialAlliance, loading: loadingProp = false }) {
   const safeAlliance = initialAlliance || {};

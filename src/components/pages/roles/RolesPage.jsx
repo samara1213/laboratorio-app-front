@@ -3,7 +3,7 @@ import CardWithTitle from '../../CardWithTitle';
 import MuiTable from '../../mui/MuiTable';
 import CreateButton from '../../mui/CreateButton';
 import EditButton from '../../mui/EditButton';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import LayoutDashboard from '../../dashboard/LayoutDashboard';
 import { getAllRolesDB, createRoleDB, updateRoleDB } from '../../../services/roleService';
 import CreateRoleModal from './CreateRoleModal';

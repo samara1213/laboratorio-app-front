@@ -4,7 +4,7 @@ import CreateButton from '../../mui/CreateButton';
 import CancelButton from '../../mui/CancelButton';
 import CardWithTitle from '../../CardWithTitle';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 export default function CreateAllianceModal({ open, onSave, onClose, loading = false }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();

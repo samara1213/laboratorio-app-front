@@ -1,76 +1,78 @@
-import React, { useState } from 'react';
-import CardWithTitle from '../CardWithTitle';
-import MuiModal from '../mui/MuiModal';
-import CancelButton from '../mui/CancelButton';
-import CreateButton from '../mui/CreateButton';
-import { changeStatusOrderDB } from '../../services/orderService';
+import { toast } from 'sonner';
+import { useChangeOrderStatus, useOrder } from '../../hooks/queries/useOrders';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Spinner } from '@/components/ui/panel';
+import { StatusChip } from '@/components/ui/status';
+import { errorMessage } from '@/lib/utils';
 
-export default function PreviewExamsModal({ open, onClose, order, loading }) {
-  const [processing, setProcessing] = useState(false);
+/**
+ * Vista previa de los exámenes de una orden, con la opción de pasarla a "Procesando"
+ * Props: open, onClose, orderId
+ */
+export default function PreviewExamsModal({ open, onClose, orderId }) {
+  const { data: order, isLoading } = useOrder(open ? orderId : null);
+  const changeStatus = useChangeOrderStatus();
 
-  const handleProcessOrder = async () => {
-    if (!order) return;
-    setProcessing(true);
-    try {
-      await changeStatusOrderDB({ ord_id: order.ord_id, ord_status: 'PROCESANDO' });
-      onClose();
-    } catch (error) {
-      // Puedes mostrar un toast si lo deseas
-      // toast.error('No se pudo procesar la orden');
-    } finally {
-      setProcessing(false);
-    }
+  const handleProcessOrder = () => {
+    changeStatus.mutate(
+      { ord_id: order.ord_id, ord_status: 'PROCESANDO' },
+      {
+        onSuccess: () => {
+          toast.success(`Orden ${order.ord_code} en proceso`);
+          onClose();
+        },
+        onError: (error) => toast.error(errorMessage(error, 'No fue posible cambiar el estado de la orden.')),
+      },
+    );
   };
 
-  if (!open) return null;  
+  const patient = [order?.customer?.cus_first_name, order?.customer?.cus_first_lastname].filter(Boolean).join(' ');
 
   return (
-    <MuiModal open={open} onClose={onClose} maxWidth="max-w-2xl">
-      <CardWithTitle title="Vista previa de exámenes a realizar">
-        {loading ? (
-          <div className="flex justify-center items-center h-32">
-            <span className="text-blue-700 font-semibold animate-pulse">Cargando datos de la orden...</span>
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
+      <DialogContent
+        size="2xl"
+        title={order ? `Orden ${order.ord_code}` : 'Exámenes de la orden'}
+        description={order ? `${patient} · ${order.customer?.cus_document_number ?? ''}` : undefined}
+        footer={
+          order && (
+            <>
+              <Button variant="secondary" onClick={onClose}>
+                Cerrar
+              </Button>
+              {['PENDIENTE', 'ORDEN CON ADJUNTO'].includes(order.ord_status) && (
+                <Button onClick={handleProcessOrder} disabled={changeStatus.isPending}>
+                  {changeStatus.isPending ? 'Guardando…' : 'Pasar a procesando'}
+                </Button>
+              )}
+            </>
+          )
+        }
+      >
+        {isLoading || !order ? (
+          <div className="flex justify-center py-10">
+            <Spinner label="Cargando la orden…" />
           </div>
-        ) : order ? (
-          <>
-            <div className="mb-4 p-4 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 shadow-sm flex flex-col sm:flex-row sm:items-center sm:gap-8">
-              <div className="mb-2 sm:mb-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-blue-900">Orden:</span>
-                  <span className="text-blue-700 text-base font-mono tracking-wide">{order.ord_code}</span>
-                </div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-blue-900">Cliente:</span>
-                  <span className="text-blue-700">{order.customer?.cus_first_name} {order.customer?.cus_first_lastname}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-blue-900">Documento:</span>
-                  <span className="text-blue-700">{order.customer?.cus_document_number}</span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-base font-semibold text-blue-800 mb-2">Exámenes solicitados</h3>
-              <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
-                {(order.exams || []).length > 0 ? (
-                  order.exams.map((exam, idx) => (
-                    <div key={idx} className="p-3 rounded border border-blue-100 bg-blue-50 flex flex-col">
-                      <span className="font-bold text-blue-900">{exam.exa_name}</span>
-                      <span className="text-gray-700 text-sm mt-1">{exam.exa_description || 'Sin descripción'}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center text-gray-400">No hay exámenes registrados</div>
-                )}
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-8">
-              <CancelButton onClick={onClose} />
-              <CreateButton title="procesar" onClick={handleProcessOrder} disabled={processing} />
-            </div>
-          </>
-        ) : null}
-      </CardWithTitle>
-    </MuiModal>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <StatusChip status={order.ord_status} className="self-start" />
+            <h3 className="text-base font-bold">Exámenes solicitados</h3>
+            {(order.exams ?? []).length > 0 ? (
+              <ul className="flex flex-col gap-2">
+                {order.exams.map((exam) => (
+                  <li key={exam.exa_id} className="flex flex-col gap-0.5 rounded-panel border border-border p-3">
+                    <span className="font-semibold">{exam.exa_name}</span>
+                    <span className="text-[15px] text-muted">{exam.exa_description || 'Sin descripción'}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-[15px] text-muted">La orden no tiene exámenes registrados.</p>
+            )}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

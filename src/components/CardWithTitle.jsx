@@ -1,15 +1,28 @@
-export default function CardWithTitle({ title, loading, loadingText = 'Cargando...', children }) {
+import { useInModal } from './mui/MuiModal';
+import { Spinner } from '@/components/ui/panel';
+import { cn } from '@/lib/utils';
+
+/**
+ * Panel con título. Dentro de un MuiModal se dibuja sin borde (el modal ya es la superficie).
+ * Props: title, loading, loadingText, actions (botones a la derecha del título), className, children
+ */
+export default function CardWithTitle({ title, loading, loadingText = 'Cargando…', actions, className, children }) {
+  const inModal = useInModal();
   return (
-    <div className="bg-white rounded-xl shadow p-6">
-      <h2 className="text-xl sm:text-2xl font-extrabold mb-4 text-[#1d4ed8] tracking-tight flex items-center gap-2">
-        <span className="inline-block w-2 h-7 bg-gradient-to-b from-[#38bdf8] to-[#6366f1] rounded-full mr-1 shadow-md"></span>
-        {title}
-      </h2>
-      {loading ? (
-        <div className="text-center text-gray-500 py-10">{loadingText}</div>
-      ) : (
-        children
-      )}
-    </div>
+    <section className={cn(inModal ? 'flex flex-col' : 'rounded-panel border border-border bg-surface', className)}>
+      <div className={cn('flex flex-col gap-3 border-b border-border px-4 py-4 sm:flex-row sm:items-center sm:px-6', inModal && 'pr-16')}>
+        <h2 className="min-w-0 flex-1 text-lg font-bold leading-snug sm:text-xl">{title}</h2>
+        {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      </div>
+      <div className="px-4 py-5 sm:px-6">
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <Spinner label={loadingText} />
+          </div>
+        ) : (
+          children
+        )}
+      </div>
+    </section>
   );
 }

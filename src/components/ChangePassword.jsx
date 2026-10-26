@@ -1,88 +1,95 @@
 // ChangePassword.jsx
-import { useForm } from 'react-hook-form';
-import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { Icon } from '@iconify/react';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { changePasswordDB } from '../services';
-import MuiInput from './mui/MuiInput';
+import AuthLayout, { PasswordInput } from './auth/AuthLayout';
+import { Button } from '@/components/ui/button';
+import { errorMessage } from '@/lib/utils';
+
+/**
+ * Campo de contraseña con etiqueta y error
+ */
+function PasswordField({ id, label, error, hint, registration, autoComplete }) {
+  const describedBy = [hint && `${id}-ayuda`, error && `${id}-error`].filter(Boolean).join(' ') || undefined;
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-[15px] font-semibold">
+        {label}
+      </label>
+      <PasswordInput id={id} autoComplete={autoComplete} invalid={Boolean(error)} aria-describedby={describedBy} {...registration} />
+      {hint && !error && (
+        <span id={`${id}-ayuda`} className="text-sm text-muted">
+          {hint}
+        </span>
+      )}
+      {error && (
+        <span id={`${id}-error`} className="text-sm text-danger-ink">
+          {error}
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function ChangePassword() {
   const { email } = useParams();
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data) => {
-    
+    setLoading(true);
     try {
-
-      setLoading(true);
-      const response = await changePasswordDB(email, data.oldPassword, data.password);
-      setLoading(false);
+      await changePasswordDB(email, data.oldPassword, data.password);
+      toast.success('Contraseña actualizada. Ingresa con tu nueva contraseña.');
       navigate('/');
-
     } catch (error) {
-
-      console.log('Error al cambiar la contraseña:', error);
+      toast.error(errorMessage(error, 'No fue posible cambiar la contraseña. Intenta de nuevo en unos minutos.'));
+    } finally {
       setLoading(false);
-      toast.error('Error al cambiar la contraseña. Por favor, inténtalo de nuevo más tarde.');
-      
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-blue-50 to-gray-200 px-2 sm:px-4">
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl w-full max-w-md border border-gray-200">
-        <div className="flex flex-col items-center mb-6">
-          <div className="bg-[#29313B] rounded-full p-3 mb-2">
-            <Icon icon="mdi:lock-reset" className="w-10 h-10 text-white" />
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#29313B] mb-1 text-center">Cambiar Contraseña</h2>
-          <p className="text-gray-500 text-sm">Usuario: <span className="font-semibold">{email}</span></p>
-        </div>
-        <div className="mb-4">
-          <MuiInput
-            label="Contraseña anterior"
-            type="password"
-            name="oldPassword"
-            placeholder="••••••••"
-            {...register('oldPassword', { required: 'La contraseña anterior es obligatoria' })}
-            error={errors.oldPassword?.message}
-          />
-        </div>
-        <div className="mb-4">
-          <MuiInput
-            label="Nueva contraseña"
-            type="password"
-            name="password"
-            placeholder="••••••••"
-            {...register('password', { required: 'La contraseña es obligatoria', minLength: { value: 6, message: 'Mínimo 6 caracteres' } })}
-            error={errors.password?.message}
-          />
-        </div>
-        <div className="mb-6">
-          <MuiInput
-            label="Confirmar contraseña"
-            type="password"
-            name="confirmPassword"
-            placeholder="••••••••"
-            {...register('confirmPassword', {
-              required: 'Confirma tu contraseña',
-              validate: value => value === watch('password') || 'Las contraseñas no coinciden',
-            })}
-            error={errors.confirmPassword?.message}
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-[#29313B] text-white py-2 rounded-lg font-semibold hover:bg-[#1e232a] transition text-lg shadow-md disabled:opacity-60"
-        >
-          {loading ? 'Cambiando...' : 'Cambiar contraseña'}
-        </button>
+    <AuthLayout title="Crea tu contraseña" description={`Es tu primer ingreso como ${email}. Cambia la contraseña que recibiste por correo.`}>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+        <PasswordField
+          id="oldPassword"
+          label="Contraseña recibida por correo"
+          autoComplete="current-password"
+          error={errors.oldPassword?.message}
+          registration={register('oldPassword', { required: 'Escribe la contraseña que recibiste' })}
+        />
+        <PasswordField
+          id="password"
+          label="Nueva contraseña"
+          autoComplete="new-password"
+          hint="Mínimo 8 caracteres."
+          error={errors.password?.message}
+          registration={register('password', {
+            required: 'Escribe la nueva contraseña',
+            minLength: { value: 8, message: 'Usa al menos 8 caracteres' },
+          })}
+        />
+        <PasswordField
+          id="confirmPassword"
+          label="Confirma la nueva contraseña"
+          autoComplete="new-password"
+          error={errors.confirmPassword?.message}
+          registration={register('confirmPassword', {
+            required: 'Vuelve a escribir la nueva contraseña',
+            validate: (value, values) => value === values.password || 'Las contraseñas no coinciden',
+          })}
+        />
+        <Button type="submit" size="lg" disabled={loading} className="mt-1 w-full">
+          {loading ? 'Guardando…' : 'Guardar contraseña'}
+        </Button>
       </form>
-    </div>
+      <Link to="/" className="text-[15px] font-semibold text-primary hover:underline">
+        Volver al inicio de sesión
+      </Link>
+    </AuthLayout>
   );
 }

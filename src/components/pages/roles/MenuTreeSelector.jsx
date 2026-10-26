@@ -68,7 +68,7 @@ export default function MenuTreeSelector({ menus = [], checkedMenus = [], setChe
     <div key={menu.men_id} className={`pl-${level * 4} flex flex-col`}>
       <div className="flex items-center gap-2">
         {menu.children && menu.children.length > 0 && setExpandedMenus && (
-          <button type="button" onClick={() => handleExpand(menu.men_id)} className="focus:outline-none">
+          <button type="button" onClick={() => handleExpand(menu.men_id)} className="focus:outline-hidden">
             {expandedMenus.includes(menu.men_id) ? '▼' : '▶'}
           </button>
         )}

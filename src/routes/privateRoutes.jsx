@@ -1,93 +1,63 @@
 // privateRoutes.jsx
-import Dashboard from '../components/Dashboard';
-import LaboratoriesPage from '../components/pages/laboratories/LaboratoriesPage';
-import MenusPage from '../components/pages/menus/MenusPage';
-import RolesPage from '../components/pages/roles/RolesPage';
-import AlliancesPage from '../components/pages/alliances/AlliancesPage';
-import ExamsPage from '../components/pages/exams/ExamsPage';
-import ParamExamsPage from '../components/pages/param_exams/ParamExamsPage';
-import CreateCustomerPage from '../components/pages/customer/CreateCustomerPage';
-import EditCustomerPage from '../components/pages/customer/EditCustomerPage';
-import CreateOrderPage from '../components/pages/orders/CreateOrderPage';
-import ResultsPage from '../components/pages/results/ResultsPage';
-import EditResultPage from '../components/pages/results/EditResultPage';
-import SearchOrdersPage from '../components/pages/orders/SearchOrdersPage';
+import { lazy, Suspense } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
-import AdminUserPage from '../components/pages/users/AdminUserPage';
+import { Spinner } from '@/components/ui/panel';
+
+// cada pantalla se descarga solo cuando se visita (bundle inicial más liviano)
+const Dashboard = lazy(() => import('../components/Dashboard'));
+const AdminUserPage = lazy(() => import('../components/pages/users/AdminUserPage'));
+const LaboratoriesPage = lazy(() => import('../components/pages/laboratories/LaboratoriesPage'));
+const MenusPage = lazy(() => import('../components/pages/menus/MenusPage'));
+const RolesPage = lazy(() => import('../components/pages/roles/RolesPage'));
+const AlliancesPage = lazy(() => import('../components/pages/alliances/AlliancesPage'));
+const ExamsPage = lazy(() => import('../components/pages/exams/ExamsPage'));
+const ParamExamsPage = lazy(() => import('../components/pages/param_exams/ParamExamsPage'));
+const CreateCustomerPage = lazy(() => import('../components/pages/customer/CreateCustomerPage'));
+const EditCustomerPage = lazy(() => import('../components/pages/customer/EditCustomerPage'));
+const CreateOrderPage = lazy(() => import('../components/pages/orders/CreateOrderPage'));
+const ResultsPage = lazy(() => import('../components/pages/results/ResultsPage'));
+const EditResultPage = lazy(() => import('../components/pages/results/EditResultPage'));
+const SearchOrdersPage = lazy(() => import('../components/pages/orders/SearchOrdersPage'));
+
+/**
+ * Pantalla de espera mientras se descarga una página
+ */
+function PageFallback() {
+  return (
+    <div className="flex min-h-dvh items-center justify-center bg-ground">
+      <Spinner label="Cargando…" />
+    </div>
+  );
+}
 
 export function PrivateRoute() {
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
   return isAuthenticated ? (
-    <div className="private-layout">
+    <Suspense fallback={<PageFallback />}>
       <Outlet />
-    </div>
+    </Suspense>
   ) : (
     <Navigate to="/" replace />
   );
 }
 
 const privateRoutes = [
-  {
-    path: '/dashboard',
-    element: <Dashboard />,
-  },
-  {
-    path: '/users',
-    element: <AdminUserPage />,
-  },
-  {
-    path: '/laboratories',
-    element: <LaboratoriesPage />,
-  },
-  {
-    path: '/menus',
-    element: <MenusPage />,
-  },
-  {
-    path: '/roles',
-    element: <RolesPage />,
-  },
-  {
-    path: '/alliances',
-    element: <AlliancesPage />,
-  },
-  {
-    path: '/exams',
-    element: <ExamsPage />,
-  },
-  {
-    path: '/param-exams',
-    element: <ParamExamsPage />,
-  },
-  {
-    path: '/customers/create',
-    element: <CreateCustomerPage />,
-  },
-  {
-    path: '/customers/edit',
-    element: <EditCustomerPage />,
-  },
-  {
-    path: '/orders/create',
-    element: <CreateOrderPage />,
-  },
-  {
-    path: '/results/:orderId',
-    element: <ResultsPage />,
-  },
-  {
-    path: '/results/edit/:orderId',
-    element: <EditResultPage />,
-  },
-  {
-    path: '/orders/search',
-    element: <SearchOrdersPage />,
-  },
-  {
-    path: '*',
-    element: <Dashboard />,
-  }
+  { path: '/dashboard', element: <Dashboard /> },
+  { path: '/users', element: <AdminUserPage /> },
+  { path: '/laboratories', element: <LaboratoriesPage /> },
+  { path: '/menus', element: <MenusPage /> },
+  { path: '/roles', element: <RolesPage /> },
+  { path: '/alliances', element: <AlliancesPage /> },
+  { path: '/exams', element: <ExamsPage /> },
+  { path: '/param-exams', element: <ParamExamsPage /> },
+  { path: '/customers/create', element: <CreateCustomerPage /> },
+  { path: '/customers/edit', element: <EditCustomerPage /> },
+  { path: '/orders/create', element: <CreateOrderPage /> },
+  { path: '/results/:orderId', element: <ResultsPage /> },
+  { path: '/results/edit/:orderId', element: <EditResultPage /> },
+  { path: '/orders/search', element: <SearchOrdersPage /> },
+  { path: '*', element: <Dashboard /> },
   // Aquí puedes agregar más rutas privadas
 ];
 

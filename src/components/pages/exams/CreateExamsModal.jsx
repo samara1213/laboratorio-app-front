@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import MuiInput from '../../mui/MuiInput';
 import MuiSelect from '../../mui/MuiSelect';
 import MuiModal from '../../mui/MuiModal';
@@ -96,7 +96,7 @@ export default function CreateExamsModal({
             {!showAllianceSelect ? (
               <button
                 type="button"
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 text-blue-800 font-bold rounded-lg shadow hover:from-blue-200 hover:to-blue-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 text-base sm:text-sm mt-2 mb-2"
+                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-blue-100 via-blue-200 to-blue-300 text-blue-800 font-bold rounded-lg shadow-sm hover:from-blue-200 hover:to-blue-400 transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 text-base sm:text-sm mt-2 mb-2"
                 style={{ minHeight: '40px' }}
                 onClick={() => setShowAllianceSelect(true)}
               >
@@ -104,14 +104,14 @@ export default function CreateExamsModal({
                 <span>Agregar aliado (opcional)</span>
               </button>
             ) : (
-              <div className="relative mt-4 mb-4 p-4 bg-blue-50 rounded-lg shadow border border-blue-200">
+              <div className="relative mt-4 mb-4 p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-200">
                 <label className="block text-gray-700 mb-2 font-medium" htmlFor="alliance">Alianza (opcional)</label>
                 <MuiSelect
                   label=""
                   name="alliance"
                   {...register('alliance')}
                   error={errors.alliance?.message}
-                  className="w-full border-2 border-blue-300 focus:border-blue-500 bg-blue-50 text-blue-900 font-semibold rounded-lg shadow-sm transition"
+                  className="w-full border-2 border-blue-300 focus:border-blue-500 bg-blue-50 text-blue-900 font-semibold rounded-lg shadow-xs transition"
                   onBlur={e => { if (!e.target.value) setShowAllianceSelect(false); }}
                 >
                   <option value="">Sin alianza</option>
@@ -121,7 +121,7 @@ export default function CreateExamsModal({
                 </MuiSelect>
                 <button
                   type="button"
-                  className="absolute top-0 right-0 mt-2 mr-2 flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-pink-200 via-pink-300 to-pink-400 text-pink-800 font-extrabold uppercase tracking-wide rounded-lg shadow hover:from-pink-300 hover:to-pink-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 text-xs"
+                  className="absolute top-0 right-0 mt-2 mr-2 flex items-center gap-1 px-3 py-1 bg-linear-to-r from-pink-200 via-pink-300 to-pink-400 text-pink-800 font-extrabold uppercase tracking-wide rounded-lg shadow-sm hover:from-pink-300 hover:to-pink-500 transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 text-xs"
                   style={{ minHeight: '32px' }}
                   onClick={() => setShowAllianceSelect(false)}
                 >

@@ -5,7 +5,7 @@ import MuiSelect from '../../mui/MuiSelect';
 import CreateButton from '../../mui/CreateButton';
 import CancelButton from '../../mui/CancelButton';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { useState } from 'react';
 import { searchCustomerByDocumentDB, updateCustomerDB } from '../../../services';
 import { useAuthStore } from '../../../hooks/authStore';
@@ -87,7 +87,7 @@ export default function EditCustomerPage({ customer, onCancel, loading = false, 
             <CardWithTitle title="Editar cliente" loading={loading}>
                 {/* Sección de búsqueda por número de documento */}
                 {showSearch && (
-                <div className="mb-8 p-4 bg-gray-50 rounded-lg shadow flex flex-col sm:flex-row items-center gap-2 border border-gray-200">
+                <div className="mb-8 p-4 bg-gray-50 rounded-lg shadow-sm flex flex-col sm:flex-row items-center gap-2 border border-gray-200">
                     <form onSubmit={handleSearch} className="flex items-center gap-2 w-full sm:w-auto">
                         <MuiInput
                             label="Buscar por número de documento"

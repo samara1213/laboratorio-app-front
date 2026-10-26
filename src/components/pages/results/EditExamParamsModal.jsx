@@ -7,7 +7,7 @@ import MuiInput from '../../mui/MuiInput';
 import SaveButton from '../../mui/SaveButton';
 import CancelButton from '../../mui/CancelButton';
 import { updateResultExamDB } from '../../../services';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 
 export default function EditExamParamsModal({ open, onClose, exam, orderId, onRefresh }) {

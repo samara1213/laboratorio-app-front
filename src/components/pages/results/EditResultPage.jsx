@@ -58,7 +58,7 @@ export default function EditResultPage() {
     <LayoutDashboard>
       <CardWithTitle title={`Editar Resultados`}>
         {cliente && (
-          <div className="mb-6 p-5 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 shadow-sm flex flex-col md:flex-row md:items-center md:gap-8">
+          <div className="mb-6 p-5 rounded-xl bg-linear-to-r from-blue-50 to-blue-100 border border-blue-200 shadow-xs flex flex-col md:flex-row md:items-center md:gap-8">
             <div className="flex-1">
               <div className="font-bold text-lg text-blue-900 mb-2 flex items-center gap-2">
                 <Icon icon="mdi:account-circle" className="text-blue-500" width={22} height={22} />
@@ -71,7 +71,7 @@ export default function EditResultPage() {
                 <div><span className="font-semibold">Teléfono:</span> {cliente.cus_phone}</div>
               </div>
             </div>
-            <div className="mt-4 md:mt-0 flex-shrink-0 flex items-center justify-center">
+            <div className="mt-4 md:mt-0 shrink-0 flex items-center justify-center">
               <div className="rounded-full bg-blue-200 h-16 w-16 flex items-center justify-center text-2xl font-bold text-blue-700 shadow-inner">
                 <span>{cliente.cus_first_name?.charAt(0)}{cliente.cus_second_name?.charAt(0)}</span>
               </div>

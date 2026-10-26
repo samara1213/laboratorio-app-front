@@ -7,7 +7,7 @@ import MuiSelect from '../../mui/MuiSelect';
 import CancelButton from '../../mui/CancelButton';
 import CreateButton from '../../mui/CreateButton';
 import { getAllRolesDB } from '../../../services';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 export default function CreateUserModal({ open, onClose, onUserCreated, laboratoryId }) {
   const [roles, setRoles] = useState([]);

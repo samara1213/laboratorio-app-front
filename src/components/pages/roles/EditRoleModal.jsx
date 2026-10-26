@@ -6,7 +6,7 @@ import CardWithTitle from '../../CardWithTitle';
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { getAllMenusDB } from '../../../services/menuService';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import MenuTreeSelector from './MenuTreeSelector';
 
 export default function EditRoleModal({ open, onSave, onClose, initialRole, loading = false }) {
@@ -118,7 +118,7 @@ export default function EditRoleModal({ open, onSave, onClose, initialRole, load
           {step === 2 && (
             <>
               <label className="block font-semibold mb-2">Permisos de menú</label>
-              <div className="max-h-64 overflow-y-auto border rounded p-2 bg-gray-50">
+              <div className="max-h-64 overflow-y-auto border rounded-sm p-2 bg-gray-50">
                 <MenuTreeSelector
                   menus={menus}
                   checkedMenus={checkedMenus}

@@ -1,66 +1,96 @@
 // Topbar.jsx
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { useAuthStore } from '../../hooks/authStore';
-import { useState, useRef, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { getThemePreference, setThemePreference } from '@/lib/theme';
 
-export default function Topbar({ onMenuClick }) {
+const THEMES = [
+  { value: 'light', label: 'Tema claro', icon: 'mdi:white-balance-sunny' },
+  { value: 'dark', label: 'Tema oscuro', icon: 'mdi:weather-night' },
+  { value: 'system', label: 'Tema del sistema', icon: 'mdi:monitor' },
+];
+
+/**
+ * Lista plana de urls del menú del usuario (para mostrar accesos según su rol)
+ */
+function menuUrls(menus = []) {
+  return menus.flatMap((m) => [m.men_url, ...menuUrls(m.children)]).filter(Boolean);
+}
+
+/**
+ * Barra superior: botón de menú (celular/tablet), título de la página, acción "Nueva orden" y menú de usuario
+ * @param {{ title?: string, onMenuClick: () => void, actions?: JSX.Element }} props
+ */
+export default function Topbar({ title, onMenuClick, actions }) {
   const { user, startLogout } = useAuthStore();
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [theme, setTheme] = useState(getThemePreference);
+  const fullName = [user?.use_primer_nombre, user?.use_primer_apellido].filter(Boolean).join(' ') || user?.use_correo;
+  const initials = (fullName || '?')
+    .split(' ')
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+  const canCreateOrder = menuUrls(user?.role?.menus).includes('/orders/create');
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpen(false);
-      }
-    }
-    if (open) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open]);
+  const changeTheme = (value) => {
+    setThemePreference(value);
+    setTheme(value);
+  };
 
   return (
-    <header className="flex items-center justify-between bg-white px-4 sm:px-6 py-4 border-b border-gray-200">
-      <div className="flex items-center gap-2">
-        <button className="md:hidden text-[#29313B] focus:outline-none" onClick={onMenuClick}>
-          <Icon icon="mdi:menu" className="w-6 h-6" />
-        </button>
-        
-      </div>
-      <div className="flex items-center gap-2 sm:gap-4 relative" ref={dropdownRef}>
-        <Icon icon="mdi:bell-outline" className="w-6 h-6 text-gray-400" />
-        <button
-          className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden focus:outline-none border-2 border-transparent focus:border-[#00B4D8] transition"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Abrir menú de usuario"
-        >
-          <Icon icon="mdi:account-circle" className="w-8 h-8 text-[#29313B]" />
-        </button>
-        <div className="hidden md:flex flex-col items-start">
-          <span className="font-medium text-[#29313B]">{user?.name || 'Usuario'}</span>    
-        </div>
-        {/* Dropdown */}
-        {open && (
-          <div className="absolute right-0 top-12 mt-2 w-72 bg-gradient-to-br from-white via-[#e0f7fa] to-[#caf0f8] rounded-2xl shadow-2xl border border-[#00B4D8] z-50 animate-fade-in p-0.5">
-            <div className="flex flex-col items-center py-7 px-6 bg-white bg-opacity-90 rounded-2xl">
-              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden mb-2 border-4 border-[#00B4D8] shadow-lg">
-                <Icon icon="mdi:account-circle" className="w-12 h-12 text-[#29313B]" />
-              </div>
-              <span className="font-bold text-[#232A34] text-lg mb-0.5 truncate w-full text-center flex items-center justify-center gap-1">
-                <Icon icon="mdi:account-badge-outline" className="w-5 h-5 text-[#00B4D8]" />
-                {user?.name || 'Usuario'}
-              </span>
-              <span className="text-xs text-gray-500 mb-2 truncate w-full text-center">{user?.use_correo || 'Sin correo'}</span>
-              <div className="w-full border-t border-[#00B4D8] my-3"></div>
-              <button
-                onClick={startLogout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 rounded-xl shadow-md transition-all duration-200"
-              >
-                <Icon icon="mdi:logout-variant" className="w-5 h-5 text-white" /> Cerrar sesión
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-surface px-2 sm:gap-3 sm:px-4 lg:h-[72px] lg:px-8">
+      <Button variant="ghost" size="icon" onClick={onMenuClick} aria-label="Abrir menú" className="text-ink lg:hidden">
+        <Icon icon="mdi:menu" className="size-6" aria-hidden="true" />
+      </Button>
+
+      <h1 className="min-w-0 flex-1 truncate text-lg font-bold sm:text-xl lg:text-2xl">{title}</h1>
+
+      {actions}
+
+      {canCreateOrder && (
+        <Button asChild className="hidden sm:inline-flex">
+          <Link to="/orders/create">
+            <Icon icon="mdi:plus" className="size-5" aria-hidden="true" />
+            Nueva orden
+          </Link>
+        </Button>
+      )}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            aria-label={`Menú de ${fullName}`}
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-tint text-[15px] font-bold text-primary"
+          >
+            {initials}
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-64">
+          <DropdownMenuLabel className="flex flex-col gap-0.5">
+            <span className="text-[15px] font-semibold text-ink">{fullName}</span>
+            <span className="truncate">{user?.use_correo}</span>
+            {user?.laboratory?.lab_name && <span className="truncate">{user.laboratory.lab_name}</span>}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {THEMES.map((t) => (
+            <DropdownMenuItem key={t.value} onSelect={() => changeTheme(t.value)}>
+              <Icon icon={t.icon} aria-hidden="true" />
+              <span className="flex-1">{t.label}</span>
+              {theme === t.value && <Icon icon="mdi:check" className="text-primary" aria-label="seleccionado" />}
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={startLogout}>
+            <Icon icon="mdi:logout" aria-hidden="true" />
+            Cerrar sesión
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }
