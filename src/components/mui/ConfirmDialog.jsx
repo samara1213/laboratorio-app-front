@@ -3,9 +3,9 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 /**
  * Confirmación de una acción destructiva. El botón nombra la acción (por defecto "Eliminar").
- * Props: open, title, message, onConfirm, onCancel, confirmLabel, loading
+ * Props: open, title, message, onConfirm, onCancel, confirmLabel, loading, confirmVariant ('danger' por defecto)
  */
-export default function ConfirmDialog({ open, title = 'Confirmar', message, onConfirm, onCancel, confirmLabel = 'Eliminar', loading = false }) {
+export default function ConfirmDialog({ open, title = 'Confirmar', message, onConfirm, onCancel, confirmLabel = 'Eliminar', loading = false, confirmVariant = 'danger' }) {
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onCancel?.()}>
       <DialogContent
@@ -17,7 +17,7 @@ export default function ConfirmDialog({ open, title = 'Confirmar', message, onCo
             <Button variant="secondary" onClick={onCancel}>
               Volver
             </Button>
-            <Button variant="danger" onClick={onConfirm} disabled={loading}>
+            <Button variant={confirmVariant} onClick={onConfirm} disabled={loading}>
               {loading ? 'Procesando…' : confirmLabel}
             </Button>
           </>

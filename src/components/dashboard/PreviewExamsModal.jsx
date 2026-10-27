@@ -5,6 +5,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/panel';
 import { StatusChip } from '@/components/ui/status';
 import { errorMessage } from '@/lib/utils';
+import { usePermissions } from '../../hooks/usePermissions';
 
 /**
  * Vista previa de los exámenes de una orden, con la opción de pasarla a "Procesando"
@@ -13,6 +14,7 @@ import { errorMessage } from '@/lib/utils';
 export default function PreviewExamsModal({ open, onClose, orderId }) {
   const { data: order, isLoading } = useOrder(open ? orderId : null);
   const changeStatus = useChangeOrderStatus();
+  const { can } = usePermissions();
 
   const handleProcessOrder = () => {
     changeStatus.mutate(
@@ -41,7 +43,7 @@ export default function PreviewExamsModal({ open, onClose, orderId }) {
               <Button variant="secondary" onClick={onClose}>
                 Cerrar
               </Button>
-              {['PENDIENTE', 'ORDEN CON ADJUNTO'].includes(order.ord_status) && (
+              {can('orders:update') && ['PENDIENTE', 'ORDEN CON ADJUNTO'].includes(order.ord_status) && (
                 <Button onClick={handleProcessOrder} disabled={changeStatus.isPending}>
                   {changeStatus.isPending ? 'Guardando…' : 'Pasar a procesando'}
                 </Button>

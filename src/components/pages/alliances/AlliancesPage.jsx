@@ -21,9 +21,7 @@ export default function AlliancesPage() {
   const fetchAlliances = async () => {
     setLoading(true);
     try {
-      const labId = user.laboratory.lab_id;
-      if (!labId) throw new Error('No se tiene laboratorio logueado');
-      const response = await getAllAlliancesDB(labId);
+      const response = await getAllAlliancesDB();
       const data = (response.data.data || []).map(alliace => ({
         ...alliace,
         accion: <EditButton onClick={() => handleEdit(alliace)} />,
@@ -59,7 +57,7 @@ export default function AlliancesPage() {
 
   const handleSaveCreate = async (data) => {
     try {
-      const response = await createAllAlliancesDB({ ...data, ali_laboratory_id: user.laboratory.lab_id });
+      const response = await createAllAlliancesDB(data);
       setCreateModalOpen(false);
       await fetchAlliances();
       return response;

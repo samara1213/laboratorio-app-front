@@ -4,34 +4,9 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { changePasswordDB } from '../services';
-import AuthLayout, { PasswordInput } from './auth/AuthLayout';
+import AuthLayout, { PasswordField } from './auth/AuthLayout';
 import { Button } from '@/components/ui/button';
 import { errorMessage } from '@/lib/utils';
-
-/**
- * Campo de contraseña con etiqueta y error
- */
-function PasswordField({ id, label, error, hint, registration, autoComplete }) {
-  const describedBy = [hint && `${id}-ayuda`, error && `${id}-error`].filter(Boolean).join(' ') || undefined;
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-[15px] font-semibold">
-        {label}
-      </label>
-      <PasswordInput id={id} autoComplete={autoComplete} invalid={Boolean(error)} aria-describedby={describedBy} {...registration} />
-      {hint && !error && (
-        <span id={`${id}-ayuda`} className="text-sm text-muted">
-          {hint}
-        </span>
-      )}
-      {error && (
-        <span id={`${id}-error`} className="text-sm text-danger-ink">
-          {error}
-        </span>
-      )}
-    </div>
-  );
-}
 
 export default function ChangePassword() {
   const { email } = useParams();
@@ -71,6 +46,7 @@ export default function ChangePassword() {
           registration={register('password', {
             required: 'Escribe la nueva contraseña',
             minLength: { value: 8, message: 'Usa al menos 8 caracteres' },
+            maxLength: { value: 64, message: 'Usa máximo 64 caracteres' },
           })}
         />
         <PasswordField

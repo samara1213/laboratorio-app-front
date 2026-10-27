@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { orders, user } from './fixtures.js';
+import { laboratories, menus, modules, orders, roles, user, users } from './fixtures.js';
 
 // los 4 tamaños de los criterios responsive (TASKS.md)
 const VIEWPORTS = [
@@ -20,6 +20,18 @@ async function mockApi(page) {
     if (url.pathname.endsWith('/orders/laboratory')) {
       const { ord_status } = route.request().postDataJSON() ?? {};
       return route.fulfill({ json: { status: 200, data: orders.filter((o) => o.ord_status === ord_status) } });
+    }
+    // lecturas de sesión y administración
+    const reads = {
+      '/api/auth/me': user,
+      '/api/auth/users': users,
+      '/api/role': roles,
+      '/api/role/modules': modules,
+      '/api/menu': menus,
+      '/api/laboratory': laboratories,
+    };
+    if (route.request().method() === 'GET' && url.pathname in reads) {
+      return route.fulfill({ json: { status: 200, data: reads[url.pathname] } });
     }
     return route.fulfill({ status: 404, json: { message: 'No simulado en la prueba' } });
   });
@@ -110,6 +122,58 @@ for (const vp of VIEWPORTS) {
         }
         expect(errors).toEqual([]);
       });
+
+      test('administración: usuarios, roles y menús', async ({ page }) => {
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+        await mockApi(page);
+        await setup(page, { theme, signedIn: true });
+
+        await page.goto('/users');
+        await expect(page.getByText('andres.zapata.restrepo@laboratorio-andino.ejemplo.test').filter({ visible: true })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-usuarios.png`, fullPage: true });
+
+        await page.goto('/roles');
+        await expect(page.getByText('Toma de muestras').filter({ visible: true })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await page.getByRole('button', { name: 'Nuevo rol' }).click();
+        const dialog = page.getByRole('dialog', { name: 'Nuevo rol' });
+        await expect(dialog.getByRole('group', { name: 'Permisos por módulo' })).toBeVisible();
+        // marcar "crear" en órdenes marca también "ver"
+        await dialog.getByLabel('Crear Órdenes').check();
+        await expect(dialog.getByLabel('Ver Órdenes')).toBeChecked();
+        await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-rol.png` });
+        await page.keyboard.press('Escape');
+
+        await page.goto('/menus');
+        await expect(page.getByRole('list', { name: 'Árbol del menú' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Subir Inicio' })).toBeDisabled();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-menus.png`, fullPage: true });
+        expect(errors).toEqual([]);
+      });
     });
   }
 }
+
+test('sin permiso para la pantalla muestra "Sin acceso"', async ({ page }) => {
+  await mockApi(page);
+  const consulta = { ...user, permissions: { orders: { view: true, create: false, update: false, delete: false } }, role: { ...user.role, rol_is_system: false } };
+  await page.route((url) => url.pathname === '/api/auth/me', (route) => route.fulfill({ json: { status: 200, data: consulta } }));
+  await page.addInitScript((u) => {
+    localStorage.setItem('auth', 'token-de-prueba');
+    localStorage.setItem('user', JSON.stringify(u));
+  }, consulta);
+  await page.goto('/users');
+  await expect(page.getByRole('heading', { name: 'Sin acceso', level: 1 })).toBeVisible();
+  await page.goto('/dashboard');
+  // sin permiso para crear órdenes no aparece el acceso directo
+  await expect(page.getByRole('heading', { name: 'Órdenes en curso', level: 1 })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Nueva orden' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Registrar resultados' })).toHaveCount(0);
+});

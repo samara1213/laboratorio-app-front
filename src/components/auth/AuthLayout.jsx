@@ -74,3 +74,28 @@ export function PasswordInput({ invalid, ...props }) {
     </div>
   );
 }
+
+/**
+ * Campo de contraseña con etiqueta y error
+ */
+export function PasswordField({ id, label, error, hint, registration, autoComplete }) {
+  const describedBy = [hint && `${id}-ayuda`, error && `${id}-error`].filter(Boolean).join(' ') || undefined;
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-[15px] font-semibold">
+        {label}
+      </label>
+      <PasswordInput id={id} autoComplete={autoComplete} invalid={Boolean(error)} aria-describedby={describedBy} {...registration} />
+      {hint && !error && (
+        <span id={`${id}-ayuda`} className="text-sm text-muted">
+          {hint}
+        </span>
+      )}
+      {error && (
+        <span id={`${id}-error`} className="text-sm text-danger-ink">
+          {error}
+        </span>
+      )}
+    </div>
+  );
+}

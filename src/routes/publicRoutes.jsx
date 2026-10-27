@@ -7,6 +7,7 @@ import { Spinner } from '@/components/ui/panel';
 
 const ForgotPassword = lazy(() => import('../components/ForgotPassword'));
 const ChangePassword = lazy(() => import('../components/ChangePassword'));
+const ResetPassword = lazy(() => import('../components/ResetPassword'));
 
 export function PublicRoute() {
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
@@ -29,6 +30,8 @@ const publicRoutes = [
   { path: '/', element: <Login /> },
   { path: '/forgot-password', element: <ForgotPassword /> },
   { path: '/change-password/:email', element: <ChangePassword /> },
+  // enlace del correo de recuperación
+  { path: '/reset-password', element: <ResetPassword /> },
   { path: '*', element: <Login /> },
 ];
 

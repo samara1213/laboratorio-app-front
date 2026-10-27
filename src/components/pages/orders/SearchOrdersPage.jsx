@@ -60,7 +60,6 @@ export default function SearchOrdersPage() {
     setLoading(true);
     try {
       const customerRes = await searchCustomerByDocumentDB({ 
-        laboratory: user?.laboratory?.lab_id,    
         cus_document_number: search });
       const customer = customerRes.data.data;
       if (!customer || !customer.cus_id) {
@@ -70,7 +69,6 @@ export default function SearchOrdersPage() {
       }
       const res = await getOrdersByCustomerIdDB({ 
         cus_id: customer.cus_id,
-        lab_id: user?.laboratory?.lab_id,
       });
       const ordersRaw = res.data.data || [];
       const formattedOrders = ordersRaw.map(o => {

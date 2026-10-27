@@ -6,19 +6,13 @@ import { useAuthStore } from '../../hooks/authStore';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { getThemePreference, setThemePreference } from '@/lib/theme';
+import { can } from '@/lib/permissions';
 
 const THEMES = [
   { value: 'light', label: 'Tema claro', icon: 'mdi:white-balance-sunny' },
   { value: 'dark', label: 'Tema oscuro', icon: 'mdi:weather-night' },
   { value: 'system', label: 'Tema del sistema', icon: 'mdi:monitor' },
 ];
-
-/**
- * Lista plana de urls del menú del usuario (para mostrar accesos según su rol)
- */
-function menuUrls(menus = []) {
-  return menus.flatMap((m) => [m.men_url, ...menuUrls(m.children)]).filter(Boolean);
-}
 
 /**
  * Barra superior: botón de menú (celular/tablet), título de la página, acción "Nueva orden" y menú de usuario
@@ -34,7 +28,7 @@ export default function Topbar({ title, onMenuClick, actions }) {
     .slice(0, 2)
     .join('')
     .toUpperCase();
-  const canCreateOrder = menuUrls(user?.role?.menus).includes('/orders/create');
+  const canCreateOrder = can(user, 'orders:create');
 
   const changeTheme = (value) => {
     setThemePreference(value);

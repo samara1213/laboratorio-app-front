@@ -26,7 +26,7 @@ export default function ParamExamsPage() {
         if (!user) return;
         (async () => {
             try {
-                const response = await getAllExamsDB(user.laboratory.lab_id);
+                const response = await getAllExamsDB();
                 setExams(response.data.data || []);
             } catch {
                 setExams([]);

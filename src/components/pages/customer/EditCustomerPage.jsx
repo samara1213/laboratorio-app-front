@@ -24,7 +24,7 @@ export default function EditCustomerPage({ customer, onCancel, loading = false, 
         setSearching(true);
         const documentNumber = e.target.search_document.value;
         try {
-            const res = await searchCustomerByDocumentDB({ laboratory: user?.laboratory?.lab_id, cus_document_number: documentNumber });
+            const res = await searchCustomerByDocumentDB({ cus_document_number: documentNumber });
             if (res.data) {                
                 reset(res.data.data);
                 setFoundCustomer(res.data.data);                
@@ -58,8 +58,7 @@ export default function EditCustomerPage({ customer, onCancel, loading = false, 
                 cus_gender: data.cus_gender,
                 cus_birthdate: data.cus_birthdate,
                 cus_phone: data.cus_phone,
-                cus_email: data.cus_email,
-                laboratory: user?.laboratory?.lab_id
+                cus_email: data.cus_email
             }
             const response = await updateCustomerDB(foundCustomer.cus_id, payload);
             toast.success(response.data.message || 'Cliente actualizado correctamente');  

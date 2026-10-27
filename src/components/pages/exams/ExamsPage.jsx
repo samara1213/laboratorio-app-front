@@ -22,8 +22,7 @@ export default function ExamsPage() {
   const fetchExams = async () => {
     setLoading(true);
     try {
-      const lab_id = user.laboratory.lab_id;
-      const response = await getAllExamsDB(lab_id);
+      const response = await getAllExamsDB();
       const classificationNames = {
         '1': 'Imagen hemograma',
         '2': 'Hematología',
@@ -54,7 +53,7 @@ export default function ExamsPage() {
   useEffect(() => {
     const fetchAlliances = async () => {
       try {
-        const response = await getAllAlliancesDB(user.laboratory.lab_id);     
+        const response = await getAllAlliancesDB();     
         setAlliances(response.data.data || []);
       } catch (e) {
         setAlliances([]);
@@ -88,10 +87,8 @@ export default function ExamsPage() {
 
   const handleCreateExam = async (data) => {
     try {
-      const lab_id = user.laboratory.lab_id;
       const payload = {
         ...data,
-        laboratory: lab_id,
         exa_price: Number(data.exa_price),
         alliance: data.alliance || null
       };
@@ -106,11 +103,8 @@ export default function ExamsPage() {
 
   const handleUpdateExam = async (data) => {
     try {
-      
-        const lab_id = user.laboratory.lab_id;
       const response = await updateExamDB(examToEdit.exa_id, {
         ...data,
-        laboratory: lab_id,
         exa_price: Number(data.exa_price),
         alliance: data.alliance || null
       });

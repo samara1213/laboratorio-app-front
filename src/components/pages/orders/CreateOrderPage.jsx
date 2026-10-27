@@ -35,7 +35,7 @@ export default function CreateOrderPage() {
         if (!user?.laboratory?.lab_id) return;
         const fetchExams = async () => {
             try {
-                const res = await getAllExamsDB(user.laboratory.lab_id);
+                const res = await getAllExamsDB();
                 // Soportar ambos posibles formatos de respuesta
                 let data = res.data?.data || res.data;
                 if (data) {
@@ -63,7 +63,6 @@ export default function CreateOrderPage() {
         setShowCreatePrompt(false);
         try {
             const res = await searchCustomerByDocumentDB({
-                laboratory: user?.laboratory?.lab_id,
                 cus_document_number: doc
             });
             if (res.data && res.data.data) {
@@ -146,7 +145,6 @@ export default function CreateOrderPage() {
                 ord_discount_percentage: Number(discountPercent),
                 ord_total_value: Number(totals.total), 
                 ord_discount_value: Number(totals.discountValue),
-                lab_id: user?.laboratory?.lab_id,
                 ord_status: "PENDIENTE"
             };
             const response = await createOrderDB(orderData);            

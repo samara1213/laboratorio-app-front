@@ -18,8 +18,7 @@ export default function CreateCustomerPage() {
     const onSubmit = async (data) => {
         try {
             const payload = {
-                ...data,
-                laboratory: user?.laboratory?.lab_id
+                ...data
             };            
             const response = await createCustomerDB(payload);
             toast.success(response.data.message || 'Cliente creado correctamente');

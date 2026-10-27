@@ -1,12 +1,15 @@
 // privateRoutes.jsx
 import { lazy, Suspense } from 'react';
 import { useSelector } from 'react-redux';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Spinner } from '@/components/ui/panel';
+import { useSession } from '../hooks/queries/useSession';
+import { canAny, firstMenuUrl } from '../lib/permissions';
+import NoAccess from '../components/dashboard/NoAccess';
 
 // cada pantalla se descarga solo cuando se visita (bundle inicial más liviano)
 const Dashboard = lazy(() => import('../components/Dashboard'));
-const AdminUserPage = lazy(() => import('../components/pages/users/AdminUserPage'));
+const UsersPage = lazy(() => import('../components/pages/users/UsersPage'));
 const LaboratoriesPage = lazy(() => import('../components/pages/laboratories/LaboratoriesPage'));
 const MenusPage = lazy(() => import('../components/pages/menus/MenusPage'));
 const RolesPage = lazy(() => import('../components/pages/roles/RolesPage'));
@@ -32,33 +35,55 @@ function PageFallback() {
 }
 
 export function PrivateRoute() {
-  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
-  return isAuthenticated ? (
+  const { isAuthenticated, user } = useSelector(state => state.auth);
+  const session = useSession(isAuthenticated);
+
+  if (!isAuthenticated) return <Navigate to="/" replace />;
+
+  // sesión guardada antes de la Fase 3 (sin permisos): se espera a /auth/me
+  if (!user?.permissions && session.isPending) return <PageFallback />;
+
+  return (
     <Suspense fallback={<PageFallback />}>
       <Outlet />
     </Suspense>
-  ) : (
-    <Navigate to="/" replace />
   );
 }
 
+/**
+ * Muestra la pantalla solo si el rol tiene alguno de los permisos. En el inicio,
+ * quien no puede ver órdenes pasa a la primera opción de su menú
+ */
+function Protected({ permissions, children }) {
+  const user = useSelector(state => state.auth.user);
+  const { pathname } = useLocation();
+
+  if (canAny(user, permissions)) return children;
+
+  const fallback = firstMenuUrl(user?.role?.menus);
+  if (pathname === '/dashboard' && fallback && fallback !== '/dashboard') return <Navigate to={fallback} replace />;
+  return <NoAccess />;
+}
+
+const guard = (element, ...permissions) => <Protected permissions={permissions}>{element}</Protected>;
+
+// cada ruta exige alguno de los permisos indicados ("modulo:accion"); el backend los vuelve a validar
 const privateRoutes = [
-  { path: '/dashboard', element: <Dashboard /> },
-  { path: '/users', element: <AdminUserPage /> },
-  { path: '/laboratories', element: <LaboratoriesPage /> },
-  { path: '/menus', element: <MenusPage /> },
-  { path: '/roles', element: <RolesPage /> },
-  { path: '/alliances', element: <AlliancesPage /> },
-  { path: '/exams', element: <ExamsPage /> },
-  { path: '/param-exams', element: <ParamExamsPage /> },
-  { path: '/customers/create', element: <CreateCustomerPage /> },
-  { path: '/customers/edit', element: <EditCustomerPage /> },
-  { path: '/orders/create', element: <CreateOrderPage /> },
-  { path: '/results/:orderId', element: <ResultsPage /> },
-  { path: '/results/edit/:orderId', element: <EditResultPage /> },
-  { path: '/orders/search', element: <SearchOrdersPage /> },
-  { path: '*', element: <Dashboard /> },
-  // Aquí puedes agregar más rutas privadas
+  { path: '/dashboard', element: guard(<Dashboard />, 'orders:view') },
+  { path: '/users', element: guard(<UsersPage />, 'users:view') },
+  { path: '/laboratories', element: guard(<LaboratoriesPage />, 'laboratories:view') },
+  { path: '/menus', element: guard(<MenusPage />, 'menus:view') },
+  { path: '/roles', element: guard(<RolesPage />, 'roles:view') },
+  { path: '/alliances', element: guard(<AlliancesPage />, 'alliances:view') },
+  { path: '/exams', element: guard(<ExamsPage />, 'exams:view') },
+  { path: '/param-exams', element: guard(<ParamExamsPage />, 'exams:view') },
+  { path: '/customers/create', element: guard(<CreateCustomerPage />, 'customers:create') },
+  { path: '/customers/edit', element: guard(<EditCustomerPage />, 'customers:update') },
+  { path: '/orders/create', element: guard(<CreateOrderPage />, 'orders:create') },
+  { path: '/results/:orderId', element: guard(<ResultsPage />, 'results:create') },
+  { path: '/results/edit/:orderId', element: guard(<EditResultPage />, 'results:update') },
+  { path: '/orders/search', element: guard(<SearchOrdersPage />, 'orders:view') },
+  { path: '*', element: <Navigate to="/dashboard" replace /> },
 ];
 
 export default privateRoutes;

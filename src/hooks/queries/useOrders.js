@@ -19,7 +19,7 @@ export function useActiveOrders(labId) {
     queryKey: orderKeys.active(labId),
     enabled: Boolean(labId),
     queryFn: async () => {
-      const responses = await Promise.all(ACTIVE_STATUSES.map((ord_status) => getOrdersByStatusDB({ lab_id: labId, ord_status })));
+      const responses = await Promise.all(ACTIVE_STATUSES.map((ord_status) => getOrdersByStatusDB({ ord_status })));
       return responses.flatMap((res) => res.data?.data ?? []);
     },
   });

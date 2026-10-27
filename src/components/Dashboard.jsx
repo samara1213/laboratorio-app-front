@@ -15,12 +15,14 @@ import { Panel, PanelHeader, Skeleton } from '@/components/ui/panel';
 import { StatusChip, TubeIcon } from '@/components/ui/status';
 import { getOrderStatus } from '@/lib/order-status';
 import { cn, errorMessage, formatDateTime } from '@/lib/utils';
+import { usePermissions } from '../hooks/usePermissions';
 
 const today = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Bogota' }).format(new Date());
 
 function Dashboard() {
   const { user } = useAuthStore();
   const { data: orders = [], isLoading, isError, refetch } = useActiveOrders(user?.laboratory?.lab_id);
+  const { can } = usePermissions();
   const cancelOrder = useCancelOrder();
   const attachFile = useAttachFile();
 
@@ -71,9 +73,11 @@ function Dashboard() {
       label: 'Acciones',
       render: (row) => (
         <>
-          <Button asChild variant="secondary" size="sm" className="max-md:h-11">
-            <Link to={`/results/${row.ord_id}`}>Registrar resultados</Link>
-          </Button>
+          {can('results:create') && (
+            <Button asChild variant="secondary" size="sm" className="max-md:h-11">
+              <Link to={`/results/${row.ord_id}`}>Registrar resultados</Link>
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="secondary" size="icon-sm" aria-label={`Más acciones de la orden ${row.code}`} className="max-md:size-11 max-md:flex-none">
@@ -85,15 +89,21 @@ function Dashboard() {
                 <Icon icon="mdi:eye-outline" aria-hidden="true" />
                 Ver exámenes de la orden
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setOrderToUpload(row)}>
-                <Icon icon="mdi:paperclip" aria-hidden="true" />
-                Adjuntar archivo
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem destructive onSelect={() => setOrderToCancel(row)}>
-                <Icon icon="mdi:close-circle-outline" aria-hidden="true" />
-                Cancelar orden
-              </DropdownMenuItem>
+              {can('orders:update') && (
+                <DropdownMenuItem onSelect={() => setOrderToUpload(row)}>
+                  <Icon icon="mdi:paperclip" aria-hidden="true" />
+                  Adjuntar archivo
+                </DropdownMenuItem>
+              )}
+              {can('orders:delete') && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem destructive onSelect={() => setOrderToCancel(row)}>
+                    <Icon icon="mdi:close-circle-outline" aria-hidden="true" />
+                    Cancelar orden
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </>
