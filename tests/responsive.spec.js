@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { laboratories, menus, modules, orders, roles, user, users } from './fixtures.js';
+import { laboratories, menus, modules, orderResults, orders, roles, user, users } from './fixtures.js';
 
 // los 4 tamaños de los criterios responsive (TASKS.md)
 const VIEWPORTS = [
@@ -29,6 +29,8 @@ async function mockApi(page) {
       '/api/role/modules': modules,
       '/api/menu': menus,
       '/api/laboratory': laboratories,
+      [`/api/orders/results/${orderResults.ord_id}`]: orderResults,
+      '/api/auth/me/signature': { url: null },
     };
     if (route.request().method() === 'GET' && url.pathname in reads) {
       return route.fulfill({ json: { status: 200, data: reads[url.pathname] } });
@@ -155,6 +157,36 @@ for (const vp of VIEWPORTS) {
         await expectNoHorizontalScroll(page);
         await expectIconsRendered(page);
         await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-menus.png`, fullPage: true });
+        expect(errors).toEqual([]);
+      });
+
+      test('resultados y perfil', async ({ page }) => {
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+        await mockApi(page);
+        await setup(page, { theme, signedIn: true });
+
+        await page.goto(`/results/${orderResults.ord_id}`);
+        await expect(page.getByRole('heading', { name: 'Resultados · orden 1048', level: 1 })).toBeVisible();
+        // abre el primer examen incompleto, con títulos de sección, rangos y teclado numérico
+        await expect(page.getByRole('heading', { name: 'SERIE ROJA', level: 3 })).toBeVisible();
+        await expect(page.getByText('Hombres 13.5–17.5 · Mujeres 12–15.5 · Niños 11–14')).toBeVisible();
+        await expect(page.getByLabel('Hemoglobina', { exact: true })).toHaveAttribute('inputmode', 'decimal');
+        await expect(page.getByLabel('Morfología', { exact: true })).toHaveValue('Normal');
+        await expect(page.getByText('Firma: Andrés Felipe Zapata · Bacteriólogo')).toBeVisible();
+        await page.getByLabel('Hemoglobina', { exact: true }).fill('13.1');
+        await expect(page.getByText('2 cambios sin guardar')).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        const save = await page.getByRole('button', { name: 'Guardar resultados' }).boundingBox();
+        expect(save.y + save.height, 'el botón de guardar queda a la vista').toBeLessThanOrEqual(vp.height + 1);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-resultados.png` });
+
+        await page.goto('/profile');
+        await expect(page.getByRole('heading', { name: 'Tu firma' })).toBeVisible();
+        await expect(page.getByText('Sin firma cargada')).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-perfil.png`, fullPage: true });
         expect(errors).toEqual([]);
       });
     });

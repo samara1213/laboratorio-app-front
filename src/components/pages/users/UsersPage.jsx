@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import LayoutDashboard from '../../dashboard/LayoutDashboard';
 import ConfirmDialog from '../../mui/ConfirmDialog';
 import UserFormDialog from './UserFormDialog';
+import SignatureField from '../../profile/SignatureField';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useAuthStore } from '../../../hooks/authStore';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { useChangeUserStatus, useLaboratories, useResetUserPassword, useRoles, useUsers } from '../../../hooks/queries/useAdmin';
@@ -35,6 +37,7 @@ export default function UsersPage() {
   const [editing, setEditing] = useState(null); // null cerrado, {} nuevo, usuario para editar
   const [toggling, setToggling] = useState(null);
   const [resetting, setResetting] = useState(null);
+  const [signing, setSigning] = useState(null);
 
   const rows = useMemo(
     () =>
@@ -90,6 +93,10 @@ export default function UsersPage() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setSigning(row)}>
+                    <Icon icon="mdi:draw-pen" aria-hidden="true" />
+                    {row.has_signature ? 'Ver o cambiar firma' : 'Cargar firma'}
+                  </DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => setResetting(row)}>
                     <Icon icon="mdi:lock-reset" aria-hidden="true" />
                     Restablecer contraseña
@@ -181,6 +188,11 @@ export default function UsersPage() {
         laboratoryId={managedLabId}
         isSelf={editing?.use_id === me?.use_id}
       />
+      <Dialog open={Boolean(signing)} onOpenChange={(value) => !value && setSigning(null)}>
+        <DialogContent size="lg" title={`Firma de ${signing?.name ?? ''}`} description="Aparece en el PDF de los exámenes que firme.">
+          {signing && <SignatureField userId={signing.use_id} name={signing.name} />}
+        </DialogContent>
+      </Dialog>
       <ConfirmDialog
         open={Boolean(toggling)}
         title={deactivating ? `Desactivar a ${toggling?.name}` : `Activar a ${toggling?.name}`}

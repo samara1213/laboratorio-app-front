@@ -19,8 +19,8 @@ const ParamExamsPage = lazy(() => import('../components/pages/param_exams/ParamE
 const CreateCustomerPage = lazy(() => import('../components/pages/customer/CreateCustomerPage'));
 const EditCustomerPage = lazy(() => import('../components/pages/customer/EditCustomerPage'));
 const CreateOrderPage = lazy(() => import('../components/pages/orders/CreateOrderPage'));
-const ResultsPage = lazy(() => import('../components/pages/results/ResultsPage'));
-const EditResultPage = lazy(() => import('../components/pages/results/EditResultPage'));
+const ResultsCapturePage = lazy(() => import('../components/pages/results/ResultsCapturePage'));
+const ProfilePage = lazy(() => import('../components/profile/ProfilePage'));
 const SearchOrdersPage = lazy(() => import('../components/pages/orders/SearchOrdersPage'));
 
 /**
@@ -80,9 +80,12 @@ const privateRoutes = [
   { path: '/customers/create', element: guard(<CreateCustomerPage />, 'customers:create') },
   { path: '/customers/edit', element: guard(<EditCustomerPage />, 'customers:update') },
   { path: '/orders/create', element: guard(<CreateOrderPage />, 'orders:create') },
-  { path: '/results/:orderId', element: guard(<ResultsPage />, 'results:create') },
-  { path: '/results/edit/:orderId', element: guard(<EditResultPage />, 'results:update') },
+  // registrar y corregir usan la misma pantalla (guardado en lote)
+  { path: '/results/:orderId', element: guard(<ResultsCapturePage />, 'results:create', 'results:update') },
+  { path: '/results/edit/:orderId', element: guard(<ResultsCapturePage />, 'results:create', 'results:update') },
   { path: '/orders/search', element: guard(<SearchOrdersPage />, 'orders:view') },
+  // cada usuario ve su perfil y su firma (solo exige sesión)
+  { path: '/profile', element: <ProfilePage /> },
   { path: '*', element: <Navigate to="/dashboard" replace /> },
 ];
 

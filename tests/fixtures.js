@@ -104,3 +104,31 @@ export const menus = [
   node('m51', 'Usuarios', '/users', 2, 'm5', 'users', 1, 'mdi:account-multiple-outline'),
   { ...node('m52', 'Roles y permisos', '/roles', 2, 'm5', 'roles', 2, 'mdi:shield-account-outline'), men_active: false },
 ];
+
+const param = (par_id, par_name, extra = {}) => ({ par_id, par_name, par_order: 0, par_range: false, par_default_value: '', result: null, observation: null, reference: null, id_result: null, ...extra });
+export const orderResults = {
+  ord_id: '44444444-4444-4444-8444-000000000000',
+  ord_code: 1048,
+  ord_status: 'PROCESANDO',
+  ord_created_at: new Date(Date.UTC(2026, 9, 24, 12, 42)).toISOString(),
+  customer: { cus_first_name: 'Ana María', cus_first_lastname: 'Rojas', cus_second_lastname: 'Pérez', cus_document_number: '1020456781', cus_gender: 'F', cus_birthdate: '1988-05-12' },
+  exams: [
+    {
+      exa_id: 'e1',
+      exa_name: 'Hemograma completo',
+      signer: null,
+      parameters: [
+        param('p0', '*SERIE ROJA', { par_order: 0 }),
+        param('p1', 'Hemoglobina', { par_order: 1, par_range: true, par_unit_extent: 'g/dL', par_min_man: '13.5', par_max_man: '17.5', par_min_woman: '12', par_max_woman: '15.5', par_min_child: '11', par_max_child: '14' }),
+        param('p2', 'Hematocrito', { par_order: 2, par_range: true, par_unit_extent: '%', par_min_man: '41', par_max_man: '53', par_min_woman: '36', par_max_woman: '46' }),
+        param('p3', 'Morfología', { par_order: 3, par_reference_value: 'Normocítica normocrómica', par_default_value: 'Normal' }),
+      ],
+    },
+    {
+      exa_id: 'e2',
+      exa_name: 'Glicemia en ayunas',
+      signer: { use_id: 'u2', nombre: 'Andrés Felipe Zapata', cargo: 'Bacteriólogo', registro: 'RP-1020', has_signature: true },
+      parameters: [param('p4', 'Glucosa', { par_order: 1, par_range: true, par_unit_extent: 'mg/dL', par_min_man: '70', par_max_man: '100', par_min_woman: '70', par_max_woman: '100', result: '92', id_result: 'r4' })],
+    },
+  ],
+};

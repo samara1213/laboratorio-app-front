@@ -7,7 +7,7 @@ import { Field, Input, Select } from '@/components/ui/field';
 import { useSaveUser } from '../../../hooks/queries/useAdmin';
 import { errorMessage } from '@/lib/utils';
 
-const EMPTY = { use_primer_nombre: '', use_primer_apellido: '', use_correo: '', use_documento: '', use_telefono: '', role: '' };
+const EMPTY = { use_primer_nombre: '', use_primer_apellido: '', use_correo: '', use_documento: '', use_telefono: '', use_cargo: '', use_registro_profesional: '', role: '' };
 
 /**
  * Crear o editar un usuario. Solo se ofrecen los roles que el administrador puede asignar
@@ -28,6 +28,8 @@ export default function UserFormDialog({ open, onClose, user, roles, laboratoryI
             use_correo: user.use_correo ?? '',
             use_documento: user.use_documento ?? '',
             use_telefono: user.use_telefono ?? '',
+            use_cargo: user.use_cargo ?? '',
+            use_registro_profesional: user.use_registro_profesional ?? '',
             role: user.role?.rol_id ?? '',
           }
         : EMPTY,
@@ -39,7 +41,7 @@ export default function UserFormDialog({ open, onClose, user, roles, laboratoryI
 
   const onSubmit = (values) => {
     const data = { ...values };
-    for (const key of ['use_documento', 'use_telefono']) if (!data[key]) delete data[key];
+    for (const key of ['use_documento', 'use_telefono', 'use_cargo', 'use_registro_profesional']) if (!data[key]) delete data[key];
     if (editing && data.role === user.role?.rol_id) delete data.role;
     if (!editing && laboratoryId) data.laboratory = laboratoryId;
 
@@ -100,6 +102,12 @@ export default function UserFormDialog({ open, onClose, user, roles, laboratoryI
           </Field>
           <Field label="Teléfono (opcional)">
             {(field) => <Input type="tel" autoComplete="off" maxLength={20} {...field} {...register('use_telefono')} />}
+          </Field>
+          <Field label="Cargo (opcional)" hint="Aparece bajo su firma en el PDF.">
+            {(field) => <Input autoComplete="off" maxLength={60} {...field} {...register('use_cargo')} />}
+          </Field>
+          <Field label="Registro profesional (opcional)">
+            {(field) => <Input autoComplete="off" maxLength={40} {...field} {...register('use_registro_profesional')} />}
           </Field>
           <Field
             label="Rol"

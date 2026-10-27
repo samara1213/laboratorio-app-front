@@ -71,6 +71,14 @@ export default function Topbar({ title, onMenuClick, actions }) {
             {user?.laboratory?.lab_name && <span className="truncate">{user.laboratory.lab_name}</span>}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link to="/profile">
+              <Icon icon="mdi:account-circle-outline" aria-hidden="true" />
+              <span className="flex-1">Mi perfil y firma</span>
+              {!user?.has_signature && <span className="size-2 rounded-full bg-cap-pend" aria-label="sin firma" />}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           {THEMES.map((t) => (
             <DropdownMenuItem key={t.value} onSelect={() => changeTheme(t.value)}>
               <Icon icon={t.icon} aria-hidden="true" />
