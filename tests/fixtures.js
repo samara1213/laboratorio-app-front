@@ -159,3 +159,64 @@ export const basePdfTemplate = {
   helpers: ['if', 'unless', 'each', 'with', 'lookup', 'eq', 'or', 'and', 'not', 'contains', 'startsWith', 'substring', 'toLowerCase', 'toUpperCase', 'default'],
   max_size: 262144,
 };
+
+// Fase 6: Buscar órdenes (con finalizadas y canceladas), pacientes, catálogo y parámetros
+const allStatuses = ['FINALIZADA', 'PENDIENTE PDF', 'PENDIENTE', 'PROCESANDO', 'FINALIZADA', 'CANCELADA', 'ORDEN CON ADJUNTO', 'FINALIZADA'];
+export const searchedOrders = orders.slice(0, 22).map((order, i) => ({
+  ...order,
+  ord_status: allStatuses[i % allStatuses.length],
+  has_pdf: allStatuses[i % allStatuses.length] === 'FINALIZADA',
+  attachments_count: i % 5 === 0 ? 1 : 0,
+  customer: { ...order.customer, cus_document_type: 'CC', has_email: i % 4 !== 1 },
+}));
+
+export const customers = patients.map(([first, last, doc], i) => ({
+  cus_id: 'c' + i,
+  cus_document_type: i === 3 ? 'TI' : 'CC',
+  cus_document_number: doc,
+  cus_first_name: first,
+  cus_second_name: '',
+  cus_first_lastname: last,
+  cus_second_lastname: '',
+  cus_gender: i % 2 ? 'M' : 'F',
+  cus_birthdate: 1950 + i * 9 + '-0' + ((i % 9) + 1) + '-15',
+  cus_phone: '300' + String(1234567 + i * 1111),
+  cus_email: i === 2 ? '' : first.split(' ')[0].toLowerCase() + '.' + last.split(' ')[0].toLowerCase() + '@correo.ejemplo.test',
+  cus_address: 'Calle ' + (10 + i) + ' # 20-30',
+  orders_count: i % 3,
+}));
+
+export const alliances = [
+  { ali_id: 'a1', ali_nombre: 'Salud Total EPS', ali_direccion: 'Carrera 7 # 72-64, Bogotá', ali_telefono: '6015550101', ali_nombre_contacto: 'Diana Moreno' },
+  { ali_id: 'a2', ali_nombre: 'Clínica del Norte', ali_direccion: 'Avenida 19 # 120-15', ali_telefono: '6015550199', ali_nombre_contacto: 'Julián Vargas' },
+];
+
+export const exams = [
+  {
+    exa_id: 'x1',
+    exa_name: 'Hemograma completo',
+    exa_description: 'Serie roja, blanca y plaquetas',
+    exa_price: 25000,
+    classification: { cla_id: 'c1', cla_name: 'HEMATOLOGÍA' },
+    alliance: alliances[0],
+    parameters: [{}, {}, {}, {}, {}],
+  },
+  { exa_id: 'x2', exa_name: 'Glicemia en ayunas', exa_price: 12000, classification: { cla_id: 'c2', cla_name: 'QUÍMICA' }, alliance: null, parameters: [{}] },
+  {
+    exa_id: 'x3',
+    exa_name: 'Perfil lipídico',
+    exa_description: 'Colesterol total, HDL, LDL y triglicéridos',
+    exa_price: 48000,
+    classification: null,
+    alliance: null,
+    parameters: [],
+  },
+];
+
+export const parameters = [
+  { par_id: 'p1', par_name: '*Serie roja', par_order: 1, par_range: false },
+  { par_id: 'p2', par_name: 'Hemoglobina', par_order: 2, par_range: true, par_unit_extent: 'g/dL', par_min_man: '13.50', par_max_man: '17.50', par_min_woman: '12.00', par_max_woman: '15.50', par_min_child: '11.00', par_max_child: '14.00' },
+  { par_id: 'p3', par_name: 'Hematocrito', par_order: 3, par_range: true, par_unit_extent: '%', par_min_man: '41', par_max_man: '53', par_min_woman: '36', par_max_woman: '46' },
+  { par_id: 'p4', par_name: '*Serie blanca', par_order: 4, par_range: false },
+  { par_id: 'p5', par_name: 'Leucocitos', par_order: 5, par_range: false, par_unit_extent: '/mm³', par_reference_value: '4.500 - 11.000', par_default_value: '' },
+];

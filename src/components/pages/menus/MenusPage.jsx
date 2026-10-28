@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import LayoutDashboard from '../../dashboard/LayoutDashboard';
-import ConfirmDialog from '../../mui/ConfirmDialog';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import MenuFormDialog from './MenuFormDialog';
 import { useDeleteMenu, useMenus, useMoveMenu, useRoleModules } from '../../../hooks/queries/useAdmin';
 import { Badge } from '@/components/ui/badge';

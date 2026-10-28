@@ -14,13 +14,17 @@ const HIDE_BELOW = { md: 'hidden md:table-cell', lg: 'hidden lg:table-cell', xl:
  * - Desde `md` (tablet) es una tabla; las columnas con `hideBelow` se ocultan en pantallas menores.
  * - En celular cada fila es una tarjeta: la primera columna (o la marcada `cardTitle`) es el título,
  *   las acciones van abajo y el resto como etiqueta/valor.
- * - Búsqueda y paginación en memoria (la paginación en el servidor llega en la Fase 6).
+ * - Búsqueda y paginación en memoria, o en el servidor con `server` (la página llega ya filtrada:
+ *   `data` es solo la página actual y la búsqueda se controla con `searchValue`/`onSearchChange`).
  *
  * @param {{
  *   columns: { key: string, label: string, render?: (row) => any, hideBelow?: 'md'|'lg'|'xl', cardTitle?: boolean,
  *              hideInCard?: boolean, align?: 'left'|'right', className?: string }[],
  *   data: object[], getRowKey?: (row, index) => string, loading?: boolean, searchable?: boolean,
- *   searchPlaceholder?: string, emptyMessage?: string, pageSizes?: number[], caption?: string, className?: string
+ *   searchPlaceholder?: string, emptyMessage?: string, pageSizes?: number[], caption?: string, className?: string,
+ *   server?: { page: number, pageSize: number, total: number, onPageChange: (page: number) => void,
+ *              onPageSizeChange: (size: number) => void },
+ *   searchValue?: string, onSearchChange?: (value: string) => void
  * }} props
  */
 export function DataTable({
@@ -34,32 +38,47 @@ export function DataTable({
   pageSizes = [10, 20, 50, 100],
   caption,
   className,
+  server,
+  searchValue,
+  onSearchChange,
 }) {
   const searchId = useId();
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(pageSizes[0]);
+  const [localSearch, setLocalSearch] = useState('');
+  const [localPage, setLocalPage] = useState(1);
+  const [localPageSize, setLocalPageSize] = useState(pageSizes[0]);
 
   const actionColumn = columns.find((c) => ACTION_KEYS.has(c.key));
   const dataColumns = columns.filter((c) => !ACTION_KEYS.has(c.key));
   const titleColumn = dataColumns.find((c) => c.cardTitle) ?? dataColumns[0];
 
-  // la búsqueda solo compara valores de texto o número (las celdas con componentes se ignoran)
-  const term = search.trim().toLowerCase();
-  const filtered = !term
-    ? data
-    : data.filter((row) =>
-        dataColumns.some((col) => {
-          const value = row[col.key];
-          return (typeof value === 'string' || typeof value === 'number') && String(value).toLowerCase().includes(term);
-        }),
-      );
+  const search = onSearchChange ? (searchValue ?? '') : localSearch;
+  const page = server ? server.page : localPage;
+  const pageSize = server ? server.pageSize : localPageSize;
+  const setPage = server ? server.onPageChange : setLocalPage;
+  const setPageSize = server ? server.onPageSizeChange : setLocalPageSize;
+  const setSearch = (value) => {
+    if (onSearchChange) onSearchChange(value);
+    else setLocalSearch(value);
+    if (!server) setLocalPage(1);
+  };
 
-  const total = filtered.length;
+  // la búsqueda en memoria solo compara valores de texto o número (las celdas con componentes se ignoran)
+  const term = search.trim().toLowerCase();
+  const filtered =
+    server || !term
+      ? data
+      : data.filter((row) =>
+          dataColumns.some((col) => {
+            const value = row[col.key];
+            return (typeof value === 'string' || typeof value === 'number') && String(value).toLowerCase().includes(term);
+          }),
+        );
+
+  const total = server ? server.total : filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * pageSize;
-  const rows = filtered.slice(start, start + pageSize);
+  const rows = server ? data : filtered.slice(start, start + pageSize);
 
   const cell = (col, row) => (col.render ? col.render(row) : row[col.key]);
   const keyOf = (row, i) => (getRowKey ? getRowKey(row, i) : row.id ?? row.key ?? i);
@@ -77,10 +96,7 @@ export function DataTable({
               id={searchId}
               type="search"
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder={searchPlaceholder}
               className="h-11 w-full rounded-control border border-border-strong bg-surface pr-3 pl-10 text-base text-ink placeholder:text-muted/80 focus-visible:border-primary"
             />
@@ -179,7 +195,7 @@ export function DataTable({
                 value={pageSize}
                 onChange={(e) => {
                   setPageSize(Number(e.target.value));
-                  setPage(1);
+                  if (!server) setLocalPage(1);
                 }}
                 className="h-10 rounded-control border border-border-strong bg-surface px-2 text-base text-ink"
               >
@@ -190,10 +206,15 @@ export function DataTable({
                 ))}
               </select>
             </label>
-            <Button variant="secondary" size="sm" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1}>
+            {totalPages > 1 && (
+              <span className="tabular">
+                Página {currentPage} de {totalPages}
+              </span>
+            )}
+            <Button variant="secondary" size="sm" className="max-md:h-11" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1 || loading}>
               Anterior
             </Button>
-            <Button variant="secondary" size="sm" onClick={() => setPage(currentPage + 1)} disabled={currentPage === totalPages}>
+            <Button variant="secondary" size="sm" className="max-md:h-11" onClick={() => setPage(currentPage + 1)} disabled={currentPage === totalPages || loading}>
               Siguiente
             </Button>
           </div>

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import LayoutDashboard from '../../dashboard/LayoutDashboard';
-import ConfirmDialog from '../../mui/ConfirmDialog';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import UploadTemplateDialog from './UploadTemplateDialog';
 import TemplateGuideDialog from './TemplateGuideDialog';
 import { usePdfPreview } from './PdfPreview';

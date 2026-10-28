@@ -30,4 +30,7 @@ export const sendResultsOrderDB = async (orderId) => {
 }
 export const getUrlPrefirredOrderDB = async (orderId) => {
     return await laboratorioApi.get(`/orders/urlprefirmate/${orderId}`);
+}// búsqueda paginada en el servidor: { page, limit, search, status: 'A,B', from, to } (AAAA-MM-DD)
+export const searchOrdersDB = async (params) => {
+    return await laboratorioApi.get('/orders', { params });
 }

@@ -6,6 +6,7 @@ import {
   createUserDB,
   deleteMenuDB,
   deleteRoleDB,
+  createLaboratoryDB,
   getAllLaboratoriesDB,
   getAllMenusDB,
   getAllRolesDB,
@@ -15,6 +16,7 @@ import {
   resetUserPasswordDB,
   updateMenuDB,
   updateRoleDB,
+  updateLaboratoryDB,
   updateUserDB,
 } from '../../services';
 import { sessionKey } from './useSession';
@@ -90,3 +92,7 @@ export const useSaveMenu = () =>
 export const useMoveMenu = () => useAdminMutation(({ id, direction }) => moveMenuDB(id, direction), [adminKeys.menus, sessionKey]);
 
 export const useDeleteMenu = () => useAdminMutation((id) => deleteMenuDB(id), [adminKeys.menus, sessionKey]);
+
+// crear o editar un laboratorio (solo super administrador)
+export const useSaveLaboratory = () =>
+  useAdminMutation(({ id, data }) => (id ? updateLaboratoryDB(id, data) : createLaboratoryDB(data)), [adminKeys.laboratories]);

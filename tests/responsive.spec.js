@@ -1,5 +1,22 @@
 import { expect, test } from '@playwright/test';
-import { basePdfTemplate, classifications, laboratories, menus, modules, orderResults, orders, pdfTemplates, roles, user, users } from './fixtures.js';
+import {
+  alliances,
+  basePdfTemplate,
+  classifications,
+  customers,
+  exams,
+  laboratories,
+  menus,
+  modules,
+  orderResults,
+  orders,
+  parameters,
+  pdfTemplates,
+  roles,
+  searchedOrders,
+  user,
+  users,
+} from './fixtures.js';
 
 // los 4 tamaños de los criterios responsive (TASKS.md)
 const VIEWPORTS = [
@@ -39,17 +56,29 @@ async function mockApi(page) {
       return route.fulfill({ json: { status: 200, data: { cus_id: 'c1', cus_document_type: 'CC', ...orderResults.customer, cus_phone: '3001234567', cus_email: 'ana.rojas@ejemplo.test' } } });
     }
     if (url.pathname === '/api/exams') {
+      return route.fulfill({ json: { status: 200, data: exams } });
+    }
+    // búsqueda paginada de órdenes: filtra por estado y devuelve el conteo por estado
+    if (url.pathname === '/api/orders') {
+      const statusFilter = url.searchParams.get('status')?.split(',') ?? [];
+      const limit = Number(url.searchParams.get('limit') ?? 20);
+      const page = Number(url.searchParams.get('page') ?? 1);
+      const rows = searchedOrders.filter((o) => !statusFilter.length || statusFilter.includes(o.ord_status));
+      const status_counts = {};
+      for (const o of searchedOrders) status_counts[o.ord_status] = (status_counts[o.ord_status] ?? 0) + 1;
       return route.fulfill({
         json: {
           status: 200,
-          data: [
-            { exa_id: 'x1', exa_name: 'Hemograma completo', exa_description: 'Serie roja, blanca y plaquetas', exa_price: 25000 },
-            { exa_id: 'x2', exa_name: 'Glicemia en ayunas', exa_price: 12000 },
-            { exa_id: 'x3', exa_name: 'Perfil lipídico', exa_description: 'Colesterol total, HDL, LDL y triglicéridos', exa_price: 48000 },
-          ],
+          data: rows.slice((page - 1) * limit, page * limit),
+          meta: { page, limit, total: rows.length, pages: Math.max(1, Math.ceil(rows.length / limit)), status_counts },
         },
       });
     }
+    if (url.pathname === '/api/customers') {
+      return route.fulfill({ json: { status: 200, data: customers, meta: { page: 1, limit: 20, total: 57, pages: 3 } } });
+    }
+    if (url.pathname === '/api/alliance') return route.fulfill({ json: { status: 200, data: alliances } });
+    if (url.pathname === '/api/params-exams/exam/x1') return route.fulfill({ json: { status: 200, data: parameters } });
     if (route.request().method() === 'GET' && url.pathname in reads) {
       return route.fulfill({ json: { status: 200, data: reads[url.pathname] } });
     }
@@ -236,6 +265,91 @@ for (const vp of VIEWPORTS) {
         await expectNoHorizontalScroll(page);
         await expectIconsRendered(page);
         await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-clasificaciones.png`, fullPage: true });
+        expect(errors).toEqual([]);
+      });
+
+      test('buscar órdenes y pacientes', async ({ page }) => {
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+        await mockApi(page);
+        await setup(page, { theme, signedIn: true });
+
+        await page.goto('/orders/search');
+        await expect(page.getByRole('button', { name: /Finalizada/ })).toBeVisible();
+        await expect(page.getByText('22 órdenes')).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Ver PDF' }).filter({ visible: true }).first()).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-buscar-ordenes.png`, fullPage: true });
+
+        // el chip filtra en el servidor y queda en la url
+        await page.getByRole('button', { name: /Finalizada/ }).click();
+        await expect(page).toHaveURL(/status=FINALIZADA/);
+        await expect(page.getByText(`${searchedOrders.filter((o) => o.ord_status === 'FINALIZADA').length} órdenes`)).toBeVisible();
+        await page.getByRole('button', { name: 'Más acciones de la orden 1048' }).filter({ visible: true }).click();
+        await expect(page.getByRole('menuitem', { name: 'Enviar al correo del paciente' })).toBeVisible();
+        await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-acciones-orden.png` });
+        await page.keyboard.press('Escape');
+
+        await page.goto('/customers');
+        await expect(page.getByText('57 pacientes')).toBeVisible();
+        await expect(page.getByText('Valentina Ruiz Cárdenas').filter({ visible: true })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-pacientes.png`, fullPage: true });
+
+        await page.goto('/customers/create?documento=1020456799');
+        const form = page.getByRole('dialog', { name: 'Registrar paciente' });
+        await expect(form.getByLabel('Número de documento')).toHaveValue('1020456799');
+        await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-registrar-paciente.png` });
+        expect(errors).toEqual([]);
+      });
+
+      test('catálogo: exámenes, parámetros, convenios y laboratorios', async ({ page }) => {
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+        await mockApi(page);
+        await setup(page, { theme, signedIn: true });
+
+        await page.goto('/exams');
+        await expect(page.getByText('Perfil lipídico').filter({ visible: true })).toBeVisible();
+        await expect(page.getByText('1 sin clasificación', { exact: false })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-examenes.png`, fullPage: true });
+        await page.getByRole('button', { name: 'Editar' }).filter({ visible: true }).first().click();
+        await expect(page.getByRole('dialog', { name: 'Editar examen' })).toBeVisible();
+        await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-examen-form.png` });
+        await page.keyboard.press('Escape');
+
+        await page.goto('/param-exams?examen=x1');
+        await expect(page.getByText('Hombres: 13.5 – 17.5', { exact: false }).filter({ visible: true }).first()).toBeVisible();
+        await expect(page.getByText('Subtítulo').filter({ visible: true }).first()).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-parametros.png`, fullPage: true });
+        await page.getByRole('button', { name: 'Editar' }).filter({ visible: true }).nth(1).click();
+        const paramForm = page.getByRole('dialog', { name: 'Editar parámetro' });
+        await expect(paramForm.getByText('Mujeres', { exact: true })).toBeVisible();
+        await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-parametro-form.png` });
+        await page.keyboard.press('Escape');
+
+        await page.goto('/alliances');
+        await expect(page.getByText('Salud Total EPS').filter({ visible: true })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-convenios.png`, fullPage: true });
+
+        await page.goto('/laboratories');
+        await expect(page.getByRole('heading', { name: 'Laboratorios del sistema' })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-laboratorios.png`, fullPage: true });
         expect(errors).toEqual([]);
       });
 

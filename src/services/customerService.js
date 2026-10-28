@@ -8,4 +8,7 @@ export const searchCustomerByDocumentDB = async (data) => {
 }
 export const updateCustomerDB = async (customer_id, data) => {  
     return await laboratorioApi.patch(`/customers/${customer_id}`, data);
+}// pacientes del laboratorio paginados: { page, limit, search }
+export const getCustomersDB = async (params) => {
+    return await laboratorioApi.get('/customers', { params });
 }

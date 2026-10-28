@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -35,7 +35,10 @@ export default function CreateOrderPage() {
   const { can } = usePermissions();
   const { data: exams = [], isLoading: loadingExams } = useExams();
 
-  const [doc, setDoc] = useState('');
+  // al volver de registrar el paciente llega su documento (?documento=)
+  const [searchParams] = useSearchParams();
+  const initialDoc = searchParams.get('documento') ?? '';
+  const [doc, setDoc] = useState(initialDoc);
   const [searching, setSearching] = useState(false);
   const [customer, setCustomer] = useState(null);
   const [notFound, setNotFound] = useState(false);
@@ -61,13 +64,12 @@ export default function CreateOrderPage() {
     return list.slice(0, 50);
   }, [exams, examSearch]);
 
-  const onSearch = async (event) => {
-    event.preventDefault();
-    if (!doc.trim()) return;
+  const searchDocument = async (value) => {
+    if (!value.trim()) return;
     setSearching(true);
     setNotFound(false);
     try {
-      const response = await searchCustomerByDocumentDB({ cus_document_number: doc.trim() });
+      const response = await searchCustomerByDocumentDB({ cus_document_number: value.trim() });
       if (response.data?.data) setCustomer(response.data.data);
       else setNotFound(true);
     } catch (error) {
@@ -77,6 +79,18 @@ export default function CreateOrderPage() {
       setSearching(false);
     }
   };
+
+  const onSearch = (event) => {
+    event.preventDefault();
+    searchDocument(doc);
+  };
+
+  // documento recibido en la url: se busca al entrar
+  useEffect(() => {
+    if (initialDoc) searchDocument(initialDoc);
+    // solo al montar
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleExam = (exam) =>
     setItems((prev) =>
@@ -163,7 +177,10 @@ export default function CreateOrderPage() {
                 <div role="status" className="mt-4 flex flex-col gap-3 rounded-panel border border-border bg-ground p-4 sm:flex-row sm:items-center">
                   <p className="flex-1 text-[15px]">No hay un paciente con el documento {doc}.</p>
                   {can('customers:create') && (
-                    <Link to="/customers/create" className={buttonVariants({ variant: 'secondary' })}>
+                    <Link
+                      to={`/customers/create?${new URLSearchParams({ documento: doc.trim(), volver: 'orden' })}`}
+                      className={buttonVariants({ variant: 'secondary' })}
+                    >
                       <Icon icon="mdi:account-plus-outline" className="size-5" aria-hidden="true" />
                       Registrar paciente
                     </Link>

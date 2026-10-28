@@ -18,8 +18,7 @@ const ExamsPage = lazy(() => import('../components/pages/exams/ExamsPage'));
 const ParamExamsPage = lazy(() => import('../components/pages/param_exams/ParamExamsPage'));
 const ExamClassificationsPage = lazy(() => import('../components/pages/exam_classifications/ExamClassificationsPage'));
 const PdfTemplatesPage = lazy(() => import('../components/pages/pdf_templates/PdfTemplatesPage'));
-const CreateCustomerPage = lazy(() => import('../components/pages/customer/CreateCustomerPage'));
-const EditCustomerPage = lazy(() => import('../components/pages/customer/EditCustomerPage'));
+const PatientsPage = lazy(() => import('../components/pages/customer/PatientsPage'));
 const CreateOrderPage = lazy(() => import('../components/pages/orders/CreateOrderPage'));
 const ResultsCapturePage = lazy(() => import('../components/pages/results/ResultsCapturePage'));
 const ProfilePage = lazy(() => import('../components/profile/ProfilePage'));
@@ -81,8 +80,10 @@ const privateRoutes = [
   { path: '/param-exams', element: guard(<ParamExamsPage />, 'exams:view') },
   { path: '/exam-classifications', element: guard(<ExamClassificationsPage />, 'exams:view') },
   { path: '/pdf-templates', element: guard(<PdfTemplatesPage />, 'pdf_templates:view') },
-  { path: '/customers/create', element: guard(<CreateCustomerPage />, 'customers:create') },
-  { path: '/customers/edit', element: guard(<EditCustomerPage />, 'customers:update') },
+  // listado de pacientes; /create abre el formulario de registro (las urls de los menús existentes)
+  { path: '/customers', element: guard(<PatientsPage />, 'customers:view') },
+  { path: '/customers/create', element: guard(<PatientsPage />, 'customers:create') },
+  { path: '/customers/edit', element: guard(<PatientsPage />, 'customers:update') },
   { path: '/orders/create', element: guard(<CreateOrderPage />, 'orders:create') },
   // registrar y corregir usan la misma pantalla (guardado en lote)
   { path: '/results/:orderId', element: guard(<ResultsCapturePage />, 'results:create', 'results:update') },
