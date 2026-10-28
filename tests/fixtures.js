@@ -11,7 +11,7 @@ export const user = {
   laboratory: { lab_id: '22222222-2222-4222-8222-222222222222', lab_name: 'Laboratorio Andino', lab_nit: '900123456' },
   // super administrador de prueba: ve todas las pantallas
   permissions: Object.fromEntries(
-    ['orders', 'results', 'customers', 'exams', 'alliances', 'users', 'roles', 'menus', 'laboratories'].map((m) => [m, { view: true, create: true, update: true, delete: true }]),
+    ['orders', 'results', 'customers', 'exams', 'alliances', 'users', 'roles', 'menus', 'laboratories', 'pdf_templates'].map((m) => [m, { view: true, create: true, update: true, delete: true }]),
   ),
   role: {
     rol_id: '33333333-3333-4333-8333-333333333333',
@@ -131,4 +131,31 @@ export const orderResults = {
       parameters: [param('p4', 'Glucosa', { par_order: 1, par_range: true, par_unit_extent: 'mg/dL', par_min_man: '70', par_max_man: '100', par_min_woman: '70', par_max_woman: '100', result: '92', id_result: 'r4' })],
     },
   ],
+};
+
+// Fase 5: clasificaciones de exámenes y plantillas PDF
+const SYSTEM_CLASSIFICATIONS = ['HEMATOLOGÍA', 'QUÍMICA', 'INMUNOLOGÍA', 'MICROBIOLOGÍA'];
+export const classifications = [
+  ...SYSTEM_CLASSIFICATIONS.map((name, i) => ({
+    cla_id: `c${i + 1}`,
+    cla_name: name,
+    cla_order: i + 1,
+    cla_show_images: i === 0,
+    cla_active: true,
+    laboratory: null,
+    exams_count: 6 - i,
+    editable: true,
+  })),
+  { cla_id: 'c9', cla_name: 'SEROLOGÍA E INFECCIOSAS', cla_order: 9, cla_show_images: false, cla_active: false, laboratory: { lab_id: laboratories[0].lab_id, lab_name: 'Laboratorio Andino' }, exams_count: 0, editable: true },
+];
+
+export const pdfTemplates = [
+  { tpl_id: 't1', tpl_name: 'Membrete institucional 2026', tpl_description: 'Logo grande y firma por examen', tpl_active: true, tpl_size: 14336, tpl_created_at: '2026-10-20T15:42:00Z', laboratory: { lab_id: laboratories[0].lab_id, lab_name: 'Laboratorio Andino' }, created_by: 'Paula Montoya' },
+  { tpl_id: 't2', tpl_name: 'Formato general del sistema', tpl_description: null, tpl_active: false, tpl_size: 9830, tpl_created_at: '2026-10-18T13:05:00Z', laboratory: null, created_by: 'Paula Montoya' },
+];
+
+export const basePdfTemplate = {
+  tpl_content: '<html><body>{{#each clasificaciones}}<h2>{{nombre}}</h2>{{/each}}</body></html>',
+  helpers: ['if', 'unless', 'each', 'with', 'lookup', 'eq', 'or', 'and', 'not', 'contains', 'startsWith', 'substring', 'toLowerCase', 'toUpperCase', 'default'],
+  max_size: 262144,
 };

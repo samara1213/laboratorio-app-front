@@ -12,3 +12,6 @@ export { createOrderDB, getOrdersByStatusDB, deleteOrderDB, getOrderByIdDB,
 export { createResultDB, updateResultExamDB, saveResultsBatchDB } from './resultService';
 export { getAllUsersDB, updateUserDB, createUserDB, changeUserStatusDB, resetUserPasswordDB } from './userService';
 export { uploadFile } from './attached';
+export { getExamClassificationsDB, createExamClassificationDB, updateExamClassificationDB } from './examClassificationsService';
+export { getPdfTemplatesDB, getDefaultPdfTemplateDB, getPdfTemplateDB, createPdfTemplateDB, previewPdfTemplateFileDB,
+         previewPdfTemplateDB, updatePdfTemplateDB, activatePdfTemplateDB, deactivatePdfTemplateDB, deletePdfTemplateDB } from './pdfTemplatesService';

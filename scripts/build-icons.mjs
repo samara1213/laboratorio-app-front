@@ -10,7 +10,8 @@ import { getIcons } from '@iconify/utils';
 const MENU_ICONS = [
   'account-edit-outline', 'account-multiple-outline', 'account-outline', 'account-plus-outline',
   'clipboard-text-outline', 'cog-outline', 'domain', 'file-document-outline', 'format-list-bulleted',
-  'handshake-outline', 'home-outline', 'plus-circle-outline', 'shield-account-outline', 'tune-variant',
+  'file-document-edit-outline', 'handshake-outline', 'home-outline', 'plus-circle-outline', 'shape-outline',
+  'shield-account-outline', 'tune-variant',
 ];
 
 const names = new Set(MENU_ICONS);

@@ -16,6 +16,8 @@ const RolesPage = lazy(() => import('../components/pages/roles/RolesPage'));
 const AlliancesPage = lazy(() => import('../components/pages/alliances/AlliancesPage'));
 const ExamsPage = lazy(() => import('../components/pages/exams/ExamsPage'));
 const ParamExamsPage = lazy(() => import('../components/pages/param_exams/ParamExamsPage'));
+const ExamClassificationsPage = lazy(() => import('../components/pages/exam_classifications/ExamClassificationsPage'));
+const PdfTemplatesPage = lazy(() => import('../components/pages/pdf_templates/PdfTemplatesPage'));
 const CreateCustomerPage = lazy(() => import('../components/pages/customer/CreateCustomerPage'));
 const EditCustomerPage = lazy(() => import('../components/pages/customer/EditCustomerPage'));
 const CreateOrderPage = lazy(() => import('../components/pages/orders/CreateOrderPage'));
@@ -77,6 +79,8 @@ const privateRoutes = [
   { path: '/alliances', element: guard(<AlliancesPage />, 'alliances:view') },
   { path: '/exams', element: guard(<ExamsPage />, 'exams:view') },
   { path: '/param-exams', element: guard(<ParamExamsPage />, 'exams:view') },
+  { path: '/exam-classifications', element: guard(<ExamClassificationsPage />, 'exams:view') },
+  { path: '/pdf-templates', element: guard(<PdfTemplatesPage />, 'pdf_templates:view') },
   { path: '/customers/create', element: guard(<CreateCustomerPage />, 'customers:create') },
   { path: '/customers/edit', element: guard(<EditCustomerPage />, 'customers:update') },
   { path: '/orders/create', element: guard(<CreateOrderPage />, 'orders:create') },

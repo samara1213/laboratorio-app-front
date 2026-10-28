@@ -58,7 +58,7 @@ export default function EditLaboratoryModal({ lab: initialLab, open, onSave, onC
   return (
     <MuiModal open={open} onClose={onClose} maxWidth="max-w-2xl">
       <CardWithTitle title="Editar Laboratorio" loading={loadingProp}>
-        {error && <div className="mb-4 text-red-500">{error}</div>}
+        {error && <div className="mb-4 text-danger-ink">{error}</div>}
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <MuiInput
             label="Nombre laboratorio"

@@ -1,6 +1,6 @@
 // Topbar.jsx
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { useAuthStore } from '../../hooks/authStore';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,9 @@ export default function Topbar({ title, onMenuClick, actions }) {
     .slice(0, 2)
     .join('')
     .toUpperCase();
-  const canCreateOrder = can(user, 'orders:create');
+  const { pathname } = useLocation();
+  // el acceso directo sobra en la propia pantalla de crear orden
+  const canCreateOrder = can(user, 'orders:create') && pathname !== '/orders/create';
 
   const changeTheme = (value) => {
     setThemePreference(value);

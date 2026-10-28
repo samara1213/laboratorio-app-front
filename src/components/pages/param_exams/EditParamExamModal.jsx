@@ -88,8 +88,8 @@ export default function EditParamExamModal({ open, onClose, onSubmit: onSave, lo
                     />
                     {/* Campos de rango, solo visibles y obligatorios si aplicaRango */}
                     {aplicaRango && (
-                        <div className="sm:col-span-2 rounded-lg border-2 border-blue-400 bg-blue-50 p-4 flex flex-col gap-2 relative">
-                            <span className="absolute -top-3 left-4 bg-blue-400 text-white text-xs px-2 py-0.5 rounded-sm shadow-sm">Valores de rango</span>
+                        <div className="sm:col-span-2 rounded-lg border-2 border-border bg-tint p-4 flex flex-col gap-2 relative">
+                            <span className="absolute -top-3 left-4 bg-primary text-on-primary text-xs px-2 py-0.5 rounded-sm shadow-sm">Valores de rango</span>
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <MuiInput
                                     label="Mínimo hombre"
@@ -174,7 +174,7 @@ export default function EditParamExamModal({ open, onClose, onSubmit: onSave, lo
                         error={errors.par_order?.message}
                         className="w-full"
                     />
-                    <div className="flex justify-end gap-2 sm:col-span-2 sticky bottom-0 bg-blue-50/80 pt-2 pb-1 z-10">
+                    <div className="flex justify-end gap-2 sm:col-span-2 sticky bottom-0 bg-tint pt-2 pb-1 z-10">
                         <CreateButton type="submit" title="Guardar cambios" />
                         <CancelButton onClick={handleClose} />
                     </div>

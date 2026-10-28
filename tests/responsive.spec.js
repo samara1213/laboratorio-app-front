@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { laboratories, menus, modules, orderResults, orders, roles, user, users } from './fixtures.js';
+import { basePdfTemplate, classifications, laboratories, menus, modules, orderResults, orders, pdfTemplates, roles, user, users } from './fixtures.js';
 
 // los 4 tamaños de los criterios responsive (TASKS.md)
 const VIEWPORTS = [
@@ -31,7 +31,25 @@ async function mockApi(page) {
       '/api/laboratory': laboratories,
       [`/api/orders/results/${orderResults.ord_id}`]: orderResults,
       '/api/auth/me/signature': { url: null },
+      '/api/exam-classifications': classifications,
+      '/api/pdf-templates': pdfTemplates,
+      '/api/pdf-templates/default': basePdfTemplate,
     };
+    if (url.pathname === '/api/customers/searches') {
+      return route.fulfill({ json: { status: 200, data: { cus_id: 'c1', cus_document_type: 'CC', ...orderResults.customer, cus_phone: '3001234567', cus_email: 'ana.rojas@ejemplo.test' } } });
+    }
+    if (url.pathname === '/api/exams') {
+      return route.fulfill({
+        json: {
+          status: 200,
+          data: [
+            { exa_id: 'x1', exa_name: 'Hemograma completo', exa_description: 'Serie roja, blanca y plaquetas', exa_price: 25000 },
+            { exa_id: 'x2', exa_name: 'Glicemia en ayunas', exa_price: 12000 },
+            { exa_id: 'x3', exa_name: 'Perfil lipídico', exa_description: 'Colesterol total, HDL, LDL y triglicéridos', exa_price: 48000 },
+          ],
+        },
+      });
+    }
     if (route.request().method() === 'GET' && url.pathname in reads) {
       return route.fulfill({ json: { status: 200, data: reads[url.pathname] } });
     }
@@ -157,6 +175,67 @@ for (const vp of VIEWPORTS) {
         await expectNoHorizontalScroll(page);
         await expectIconsRendered(page);
         await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-menus.png`, fullPage: true });
+        expect(errors).toEqual([]);
+      });
+
+      test('crear orden', async ({ page }) => {
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+        await mockApi(page);
+        await setup(page, { theme, signedIn: true });
+        await page.goto('/orders/create');
+        await page.getByLabel('Documento').fill('1020456781');
+        await page.getByRole('button', { name: 'Buscar' }).click();
+        await expect(page.getByText('Ana María Rojas Pérez')).toBeVisible();
+        await page.getByRole('button', { name: /Hemograma completo/ }).click();
+        await page.getByRole('button', { name: /Perfil lipídico/ }).click();
+        await page.getByLabel('Descuento (%)').fill('10');
+        // 25.000 + 48.000 = 73.000; con 10 % de descuento, 65.700
+        await expect(page.getByText(/65\.700/)).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        const create = await page.getByRole('button', { name: 'Crear orden' }).boundingBox();
+        expect(create.y + create.height, 'el botón de crear queda a la vista').toBeLessThanOrEqual(vp.height + 1);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-crear-orden.png` });
+        expect(errors).toEqual([]);
+      });
+
+      test('plantillas PDF y clasificaciones', async ({ page }) => {
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+        await mockApi(page);
+        await setup(page, { theme, signedIn: true });
+
+        await page.goto('/pdf-templates');
+        await expect(page.getByRole('heading', { name: 'Qué plantilla usa cada PDF' })).toBeVisible();
+        await expect(page.getByText('Membrete institucional 2026').filter({ visible: true })).toBeVisible();
+        await expect(page.getByText('En uso', { exact: true }).filter({ visible: true })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-plantillas.png`, fullPage: true });
+
+        await page.getByRole('button', { name: 'Subir plantilla' }).click();
+        const upload = page.getByRole('dialog', { name: 'Subir plantilla' });
+        await expect(upload.getByLabel('Archivo de la plantilla')).toBeVisible();
+        await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-subir-plantilla.png` });
+        await page.keyboard.press('Escape');
+
+        await page.getByRole('button', { name: 'Guía de variables' }).click();
+        await expect(page.getByRole('heading', { name: 'Datos disponibles' })).toBeVisible();
+        await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-guia-plantillas.png` });
+        await page.keyboard.press('Escape');
+
+        await page.goto('/exam-classifications');
+        await expect(page.getByRole('heading', { name: 'Secciones del PDF de resultados' })).toBeVisible();
+        await expect(page.getByText('SEROLOGÍA E INFECCIOSAS').filter({ visible: true })).toBeVisible();
+        await expect(page.getByText('Inactiva', { exact: true }).filter({ visible: true })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-clasificaciones.png`, fullPage: true });
         expect(errors).toEqual([]);
       });
 

@@ -8,6 +8,7 @@ import CancelButton from '../../mui/CancelButton';
 import CreateButton from '../../mui/CreateButton';
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { useExamClassifications } from '../../../hooks/queries/useCatalog';
 
 export default function CreateExamsModal({
   open,
@@ -19,11 +20,14 @@ export default function CreateExamsModal({
 }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
-      exa_classification: '',
+      classification: '',
       ...defaultValues
     }
   });
   const [showAllianceSelect, setShowAllianceSelect] = useState(!!defaultValues.alliance);
+  // secciones del PDF: las del sistema y las del laboratorio que estén activas
+  const { data: classifications = [] } = useExamClassifications();
+  const classificationOptions = classifications.filter((cla) => cla.cla_active);
 
   const handleClose = () => {
     reset();
@@ -76,27 +80,26 @@ export default function CreateExamsModal({
           <div className="sm:col-span-2">
             <MuiSelect
               label="Clasificación del examen"
-              name="exa_classification"
-              {...register('exa_classification', { required: 'La clasificación es obligatoria' })}
-              error={errors.exa_classification?.message}
+              name="classification"
+              {...register('classification', { required: 'La clasificación es obligatoria' })}
+              error={errors.classification?.message}
               className="w-full mb-1"
             >
               <option value="">Seleccione clasificación</option>
-              <option value="1">Imagen hemograma</option>
-              <option value="2">Hematología</option>
-              <option value="3">Química</option>
-              <option value="4">Inmunología</option>
-              <option value="5">Microscopía</option>
-              <option value="6">Macroscopia</option>
-              <option value="7">Microbiología</option>
-              <option value="8">Hormonas</option>
+              {classificationOptions.map((cla) => (
+                <option key={cla.cla_id} value={cla.cla_id}>
+                  {cla.cla_name}
+                  {cla.cla_show_images ? ' · con imágenes adjuntas' : ''}
+                  {cla.laboratory ? '' : ' (sistema)'}
+                </option>
+              ))}
             </MuiSelect>
           </div>
           <div className="sm:col-span-2">
             {!showAllianceSelect ? (
               <button
                 type="button"
-                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-blue-100 via-blue-200 to-blue-300 text-blue-800 font-bold rounded-lg shadow-sm hover:from-blue-200 hover:to-blue-400 transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 text-base sm:text-sm mt-2 mb-2"
+                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-tint via-tint to-tint text-primary font-bold rounded-lg shadow-sm hover:from-tint hover:to-tint transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 text-base sm:text-sm mt-2 mb-2"
                 style={{ minHeight: '40px' }}
                 onClick={() => setShowAllianceSelect(true)}
               >
@@ -104,14 +107,14 @@ export default function CreateExamsModal({
                 <span>Agregar aliado (opcional)</span>
               </button>
             ) : (
-              <div className="relative mt-4 mb-4 p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-200">
-                <label className="block text-gray-700 mb-2 font-medium" htmlFor="alliance">Alianza (opcional)</label>
+              <div className="relative mt-4 mb-4 p-4 bg-tint rounded-lg shadow-sm border border-border">
+                <label className="block text-ink mb-2 font-medium" htmlFor="alliance">Alianza (opcional)</label>
                 <MuiSelect
                   label=""
                   name="alliance"
                   {...register('alliance')}
                   error={errors.alliance?.message}
-                  className="w-full border-2 border-blue-300 focus:border-blue-500 bg-blue-50 text-blue-900 font-semibold rounded-lg shadow-xs transition"
+                  className="w-full border-2 border-border focus:border-primary bg-tint text-primary font-semibold rounded-lg shadow-xs transition"
                   onBlur={e => { if (!e.target.value) setShowAllianceSelect(false); }}
                 >
                   <option value="">Sin alianza</option>

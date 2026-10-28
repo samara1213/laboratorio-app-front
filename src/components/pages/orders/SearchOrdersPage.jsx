@@ -1,3 +1,4 @@
+import { formatDateTime } from '@/lib/utils';
 import { useState } from 'react';
 import UploadButton from '../../mui/UploadButton';
 import MuiFileUploadModal from '../../mui/MuiFileUploadModal';
@@ -22,7 +23,7 @@ export default function SearchOrdersPage() {
 
   const columns = [
         { key: 'ord_code', label: 'Numero de orden' },
-        { key: 'ord_created_at', label: 'Fecha' },
+        { key: 'ord_created_at', label: 'Fecha', render: (row) => <span className="tabular">{formatDateTime(row.ord_created_at)}</span> },
         { key: 'ord_status', label: 'Estado' },
         { key: 'accion', label: 'Acciones' },
   ];
@@ -77,16 +78,16 @@ export default function SearchOrdersPage() {
           ...o,
           ord_status: (
             status === 'PENDIENTE' ?
-              <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 text-xs font-bold border border-orange-300">Pendiente</span> :
+              <span className="px-2 py-0.5 rounded-full bg-chip-pdf text-chip-pdf-ink text-xs font-bold border border-border">Pendiente</span> :
             status === 'PENDIENTE PDF' ?
-              <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-bold border border-blue-300">Pendiente PDF</span> :
+              <span className="px-2 py-0.5 rounded-full bg-tint text-primary text-xs font-bold border border-border">Pendiente PDF</span> :
             status === 'CANCELADA' ?
-              <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-xs font-bold border border-red-300">Cancelada</span> :
+              <span className="px-2 py-0.5 rounded-full bg-danger/10 text-danger-ink text-xs font-bold border border-danger">Cancelada</span> :
             status === 'FINALIZADA' ?
-              <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-bold border border-green-300">Finalizada</span> :
+              <span className="px-2 py-0.5 rounded-full bg-chip-fin text-chip-fin-ink text-xs font-bold border border-border">Finalizada</span> :
             status === 'PROCESANDO' ?
               <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-xs font-bold border border-purple-300">Procesando</span> :
-              <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 text-xs font-bold border border-gray-300">{status}</span>
+              <span className="px-2 py-0.5 rounded-full bg-ground text-ink text-xs font-bold border border-border">{status}</span>
           ),
           accion: (
             (() => {

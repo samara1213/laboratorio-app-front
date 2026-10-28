@@ -23,19 +23,9 @@ export default function ExamsPage() {
     setLoading(true);
     try {
       const response = await getAllExamsDB();
-      const classificationNames = {
-        '1': 'Imagen hemograma',
-        '2': 'Hematología',
-        '3': 'Química',
-        '4': 'Inmunología',
-        '5': 'Microscopía',
-        '6': 'Macroscopia',
-        '7': 'Microbiología',
-        '8': 'Hormonas',
-      };
       const data = (response.data.data || []).map((exam) => ({
         ...exam,
-        exa_classification: classificationNames[String(exam.exa_classification)] || '',
+        classificationName: exam.classification?.cla_name ?? 'Sin clasificación',
         aliado: exam.alliance ? exam.alliance.ali_nombre : '',
         accion: <EditButton onClick={() => handleEdit(exam)} />,
       }));   
@@ -65,7 +55,7 @@ export default function ExamsPage() {
   const columns = [
     { key: 'exa_name', label: 'Nombre del examen' },
     { key: 'exa_description', label: 'Descripcion' },
-    { key: 'exa_classification', label: 'Grupo' },
+    { key: 'classificationName', label: 'Clasificación' },
     { key: 'exa_price', label: 'Precio' },
     { key: 'aliado', label: 'Aliado' },
     { key: 'accion', label: 'Acciones' },
@@ -90,7 +80,8 @@ export default function ExamsPage() {
       const payload = {
         ...data,
         exa_price: Number(data.exa_price),
-        alliance: data.alliance || null
+        alliance: data.alliance || null,
+        classification: data.classification || null,
       };
       const response = await createExamDB(payload);
       setModalOpen(false);

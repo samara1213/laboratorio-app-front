@@ -34,10 +34,10 @@ export default function CreateCustomerPage() {
         <LayoutDashboard>
             <CardWithTitle title="Crear cliente">
                 <div className="flex flex-col items-center mb-2">
-                    <div className="rounded-full bg-green-100 border-4 border-green-400 shadow-lg w-20 h-20 flex items-center justify-center mb-2 transition-transform duration-300 hover:scale-110 hover:shadow-2xl animate__animated animate__pulse animate__infinite">
-                        <Icon icon="mdi:account-plus" className="w-12 h-12 text-green-500" />
+                    <div className="rounded-full bg-chip-fin border-4 border-border shadow-lg w-20 h-20 flex items-center justify-center mb-2 transition-transform duration-300 hover:scale-110 hover:shadow-2xl animate__animated animate__pulse animate__infinite">
+                        <Icon icon="mdi:account-plus" className="w-12 h-12 text-chip-fin-ink" />
                     </div>
-                    <span className="text-green-700 font-semibold text-lg">Nuevo cliente</span>
+                    <span className="text-chip-fin-ink font-semibold text-lg">Nuevo cliente</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 p-2 sm:grid-cols-2 max-w-full w-full">
                     <MuiSelect
@@ -116,7 +116,7 @@ export default function CreateCustomerPage() {
                         type="date"
                         {...register('cus_birthdate', { required: 'La fecha de nacimiento es obligatoria' })}
                         error={errors.cus_birthdate?.message}
-                        className="w-full border-2 border-green-400 bg-green-50 text-green-900 focus:ring-2 focus:ring-green-400 rounded-lg font-semibold placeholder:text-green-400 hover:border-green-500 transition-all duration-200 shadow-md"
+                        className="w-full border-2 border-border bg-chip-fin text-chip-fin-ink focus:ring-2 focus:ring-primary rounded-lg font-semibold placeholder:text-chip-fin-ink hover:border-border transition-all duration-200 shadow-md"
                         style={{ minHeight: 44, letterSpacing: '0.02em', boxShadow: '0 2px 8px 0 #4ade8033' }}
                     />
                     <MuiInput

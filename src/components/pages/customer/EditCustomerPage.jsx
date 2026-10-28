@@ -86,7 +86,7 @@ export default function EditCustomerPage({ customer, onCancel, loading = false, 
             <CardWithTitle title="Editar cliente" loading={loading}>
                 {/* Sección de búsqueda por número de documento */}
                 {showSearch && (
-                <div className="mb-8 p-4 bg-gray-50 rounded-lg shadow-sm flex flex-col sm:flex-row items-center gap-2 border border-gray-200">
+                <div className="mb-8 p-4 bg-ground rounded-lg shadow-sm flex flex-col sm:flex-row items-center gap-2 border border-border">
                     <form onSubmit={handleSearch} className="flex items-center gap-2 w-full sm:w-auto">
                         <MuiInput
                             label="Buscar por número de documento"
@@ -182,7 +182,7 @@ export default function EditCustomerPage({ customer, onCancel, loading = false, 
                             type="date"
                             {...register('cus_birthdate', { required: 'La fecha de nacimiento es obligatoria' })}
                             error={errors.cus_birthdate?.message}
-                            className="w-full border-2 border-green-400 bg-green-50 text-green-900 focus:ring-2 focus:ring-green-400 rounded-lg font-semibold placeholder:text-green-400 hover:border-green-500 transition-all duration-200 shadow-md"
+                            className="w-full border-2 border-border bg-chip-fin text-chip-fin-ink focus:ring-2 focus:ring-primary rounded-lg font-semibold placeholder:text-chip-fin-ink hover:border-border transition-all duration-200 shadow-md"
                             style={{ minHeight: 44, letterSpacing: '0.02em', boxShadow: '0 2px 8px 0 #4ade8033' }}
                         />
                         <MuiInput

@@ -57,7 +57,7 @@ export default function EditAllianceModal({ open, onSave, onClose, initialAllian
   return (
     <MuiModal open={open} onClose={handleClose} maxWidth="max-w-lg">
       <CardWithTitle title="Editar aliado" loading={loadingProp}>
-        {error && <div className="mb-4 text-red-500">{error}</div>}
+        {error && <div className="mb-4 text-danger-ink">{error}</div>}
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 p-2 sm:grid-cols-2 sm:gap-6">
           <div className="sm:col-span-2">
             <MuiInput
