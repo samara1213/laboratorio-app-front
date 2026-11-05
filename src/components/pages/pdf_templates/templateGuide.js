@@ -49,7 +49,7 @@ export const GUIDE_VARIABLES = [
       ['nombre', 'Nombre del examen'],
       ['parametros', 'Solo los que tienen resultado; los subtítulos (nombre con «*») tienen es_titulo'],
       ['observaciones', 'Observaciones únicas del examen'],
-      ['firmante.nombre · firmante.cargo · firmante.registro', 'Quien registró o corrigió por última vez los resultados del examen'],
+      ['firmante.nombre · firmante.cargo · firmante.registro', 'Quien registró o corrigió por última vez los resultados del examen; si el examen no tiene resultados (solo imagen adjunta), quien registró resultados más recientemente en la orden'],
       ['firmante.firma', 'Firma del profesional como imagen embebida (vacía si no la ha cargado)'],
       ['mostrar_firma', 'Verdadero en el último examen seguido del mismo firmante: imprime la firma ahí para no repetirla'],
     ],

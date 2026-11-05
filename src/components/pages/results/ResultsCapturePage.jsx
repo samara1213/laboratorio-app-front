@@ -11,6 +11,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Input, Textarea } from '@/components/ui/field';
 import { Panel, Skeleton } from '@/components/ui/panel';
 import { StatusChip } from '@/components/ui/status';
+import { LOCKED_ORDER_STATUSES } from '@/lib/order-status';
 import { cn, errorMessage, formatDateTime } from '@/lib/utils';
 
 // los parámetros cuyo nombre empieza con "*" son títulos de sección (como en el PDF)
@@ -169,6 +170,25 @@ export default function ResultsCapturePage() {
               Ir al inicio
             </Link>
           </div>
+        </Panel>
+      </LayoutDashboard>
+    );
+  }
+
+  // finalizada o cancelada: los resultados ya no se modifican (la finalizada solo regenera su PDF)
+  if (order && LOCKED_ORDER_STATUSES.includes(order.ord_status)) {
+    return (
+      <LayoutDashboard title={`Resultados · orden ${order.ord_code}`}>
+        <Panel className="flex flex-col items-start gap-4 p-6">
+          <StatusChip status={order.ord_status} />
+          <p className="text-[15px]">
+            {order.ord_status === 'FINALIZADA'
+              ? 'La orden está finalizada: sus resultados y adjuntos ya no se pueden modificar. Desde Buscar órdenes puedes ver el PDF o generarlo de nuevo.'
+              : 'La orden está cancelada: no se pueden registrar ni modificar resultados.'}
+          </p>
+          <Link to="/orders/search" className={buttonVariants({ variant: 'secondary' })}>
+            Ir a Buscar órdenes
+          </Link>
         </Panel>
       </LayoutDashboard>
     );

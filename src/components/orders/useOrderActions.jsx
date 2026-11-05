@@ -11,6 +11,7 @@ import { getUrlPrefirredOrderDB } from '../../services';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { openInNewTab } from '@/lib/open-url';
+import { LOCKED_ORDER_STATUSES } from '@/lib/order-status';
 import { errorMessage } from '@/lib/utils';
 
 // estados con resultados en captura (aún no hay PDF)
@@ -63,6 +64,8 @@ export function useOrderActions() {
     const hasPdf = order.has_pdf ?? Boolean(order.ord_pdf_url);
     const hasEmail = order.customer?.has_email ?? Boolean(order.customer?.cus_email);
     const finished = status === 'FINALIZADA';
+    // finalizada o cancelada: sin cambios en resultados ni adjuntos
+    const locked = LOCKED_ORDER_STATUSES.includes(status);
     const attachmentsCount = order.attachments_count;
 
     let primary = null;
@@ -101,7 +104,7 @@ export function useOrderActions() {
               <Icon icon="mdi:eye-outline" aria-hidden="true" />
               Ver exámenes de la orden
             </DropdownMenuItem>
-            {(status === 'PENDIENTE PDF' || finished) && can('results:update') && (
+            {status === 'PENDIENTE PDF' && can('results:update') && (
               <DropdownMenuItem asChild>
                 <Link to={`/results/edit/${order.ord_id}`}>
                   <Icon icon="mdi:pencil-outline" aria-hidden="true" />
@@ -121,10 +124,12 @@ export function useOrderActions() {
                 {hasEmail ? 'Enviar al correo del paciente' : 'Enviar al correo (el paciente no tiene)'}
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem onSelect={() => setAttachments(order)}>
-              <Icon icon="mdi:paperclip" aria-hidden="true" />
-              {attachmentsCount ? `Adjuntos (${attachmentsCount})` : can('orders:update') ? 'Adjuntar archivo' : 'Adjuntos'}
-            </DropdownMenuItem>
+            {(!locked || attachmentsCount !== 0) && (
+              <DropdownMenuItem onSelect={() => setAttachments(order)}>
+                <Icon icon="mdi:paperclip" aria-hidden="true" />
+                {attachmentsCount ? `Adjuntos (${attachmentsCount})` : can('orders:update') && !locked ? 'Adjuntar archivo' : 'Adjuntos'}
+              </DropdownMenuItem>
+            )}
             {can('orders:delete') && !finished && status !== 'CANCELADA' && (
               <>
                 <DropdownMenuSeparator />

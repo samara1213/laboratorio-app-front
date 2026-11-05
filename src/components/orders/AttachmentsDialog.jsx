@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/panel';
 import { openInNewTab } from '@/lib/open-url';
+import { LOCKED_ORDER_STATUSES } from '@/lib/order-status';
 import { errorMessage, formatDateTime } from '@/lib/utils';
 
 const MAX_SIZE = 10 * 1024 * 1024;
@@ -26,7 +27,9 @@ export default function AttachmentsDialog({ order, open, onClose }) {
   const [confirming, setConfirming] = useState(null);
   const fileInput = useRef(null);
   const cameraInput = useRef(null);
-  const canEdit = can('orders:update');
+  // finalizada o cancelada: los adjuntos solo se ven
+  const locked = LOCKED_ORDER_STATUSES.includes(order?.ord_status);
+  const canEdit = can('orders:update') && !locked;
   const touch = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches;
 
   const upload = (event) => {
@@ -63,7 +66,11 @@ export default function AttachmentsDialog({ order, open, onClose }) {
       <DialogContent
         size="lg"
         title={order ? `Adjuntos · orden ${order.ord_code}` : 'Adjuntos'}
-        description="PDF o imagen de hasta 10 MB. Las imágenes salen en el PDF de resultados, en las secciones que las incluyen."
+        description={
+          locked
+            ? `La orden está ${order?.ord_status === 'FINALIZADA' ? 'finalizada' : 'cancelada'}: sus adjuntos ya no se pueden cambiar.`
+            : 'PDF o imagen de hasta 10 MB. Las imágenes salen en el PDF de resultados, en las secciones que las incluyen.'
+        }
       >
         <div className="flex flex-col gap-5">
           {isLoading ? (

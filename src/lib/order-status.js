@@ -13,6 +13,12 @@ export const ORDER_STATUS = {
 };
 
 /**
+ * Estados en los que la orden ya no admite cambios en resultados ni adjuntos
+ * (finalizada: solo generar el PDF de nuevo). El backend responde 400 si se intenta
+ */
+export const LOCKED_ORDER_STATUSES = ['FINALIZADA', 'CANCELADA'];
+
+/**
  * Configuración visual de un estado; si no se conoce, se muestra en gris con su texto original
  * @param {string} status valor de ord_status
  */
