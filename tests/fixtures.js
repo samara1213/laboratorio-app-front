@@ -11,7 +11,7 @@ export const user = {
   laboratory: { lab_id: '22222222-2222-4222-8222-222222222222', lab_name: 'Laboratorio Andino', lab_nit: '900123456' },
   // super administrador de prueba: ve todas las pantallas
   permissions: Object.fromEntries(
-    ['orders', 'results', 'customers', 'exams', 'alliances', 'users', 'roles', 'menus', 'laboratories', 'pdf_templates'].map((m) => [m, { view: true, create: true, update: true, delete: true }]),
+    ['orders', 'results', 'customers', 'exams', 'alliances', 'users', 'roles', 'menus', 'laboratories', 'pdf_templates', 'laboratory_profile'].map((m) => [m, { view: true, create: true, update: true, delete: true }]),
   ),
   role: {
     rol_id: '33333333-3333-4333-8333-333333333333',

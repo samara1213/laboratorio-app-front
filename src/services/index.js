@@ -1,6 +1,6 @@
 export { getAllExamsDB, createExamDB, updateExamDB } from './examsService';
 export { loginUserDB, changePasswordDB, getMeDB, forgotPasswordDB, resetPasswordDB, updateProfileDB, getSignatureDB, uploadSignatureDB, deleteSignatureDB } from './authService';
-export { getAllLaboratoriesDB, updateLaboratoryDB, createLaboratoryDB } from './laboratoryService';
+export { getAllLaboratoriesDB, updateLaboratoryDB, createLaboratoryDB, getMyLaboratoryDB, getLabLogoDB, uploadLabLogoDB, deleteLabLogoDB } from './laboratoryService';
 export { getAllMenusDB, createMenuDB, updateMenuDB, moveMenuDB, deleteMenuDB } from './menuService';
 export { getAllRolesDB, getRoleModulesDB, createRoleDB, updateRoleDB, deleteRoleDB } from './roleService';
 export { getAllAlliancesDB, createAllAlliancesDB, updateAllAlliancesDB } from './alliancesService';

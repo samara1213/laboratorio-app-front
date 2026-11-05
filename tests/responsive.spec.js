@@ -48,6 +48,7 @@ async function mockApi(page) {
       '/api/laboratory': laboratories,
       [`/api/orders/results/${orderResults.ord_id}`]: orderResults,
       '/api/auth/me/signature': { url: null },
+      '/api/laboratory/me': { ...laboratories[0], has_logo: false },
       '/api/exam-classifications': classifications,
       '/api/pdf-templates': pdfTemplates,
       '/api/pdf-templates/default': basePdfTemplate,
@@ -78,6 +79,8 @@ async function mockApi(page) {
       return route.fulfill({ json: { status: 200, data: customers, meta: { page: 1, limit: 20, total: 57, pages: 3 } } });
     }
     if (url.pathname === '/api/alliance') return route.fulfill({ json: { status: 200, data: alliances } });
+    // logo del laboratorio (el propio o el de cualquiera): sin logo cargado
+    if (/^\/api\/laboratory\/[^/]+\/logo$/.test(url.pathname)) return route.fulfill({ json: { status: 200, data: { url: null } } });
     if (url.pathname === '/api/params-exams/exam/x1') return route.fulfill({ json: { status: 200, data: parameters } });
     if (route.request().method() === 'GET' && url.pathname in reads) {
       return route.fulfill({ json: { status: 200, data: reads[url.pathname] } });
@@ -350,6 +353,12 @@ for (const vp of VIEWPORTS) {
         await expectNoHorizontalScroll(page);
         await expectIconsRendered(page);
         await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-laboratorios.png`, fullPage: true });
+        await page.getByRole('button', { name: 'Logo' }).filter({ visible: true }).first().click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Cargar logo' })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-laboratorio-logo.png` });
+        await page.keyboard.press('Escape');
         expect(errors).toEqual([]);
       });
 
@@ -380,6 +389,14 @@ for (const vp of VIEWPORTS) {
         await expect(page.getByText('Sin firma cargada')).toBeVisible();
         await expectNoHorizontalScroll(page);
         await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-perfil.png`, fullPage: true });
+
+        await page.goto('/my-laboratory');
+        await expect(page.getByRole('heading', { name: 'Laboratorio Andino' })).toBeVisible();
+        await expect(page.getByText('Sin logo: el PDF sale sin imagen en el encabezado')).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Cargar logo' })).toBeVisible();
+        await expectNoHorizontalScroll(page);
+        await expectIconsRendered(page);
+        await page.screenshot({ path: `test-results/capturas/${vp.name}-${theme}-mi-laboratorio.png`, fullPage: true });
         expect(errors).toEqual([]);
       });
     });

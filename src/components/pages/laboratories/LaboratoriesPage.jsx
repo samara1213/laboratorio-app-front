@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import LayoutDashboard from '../../dashboard/LayoutDashboard';
+import LogoField from '../../laboratory/LogoField';
 import { useLaboratories, useSaveLaboratory } from '../../../hooks/queries/useAdmin';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { Badge } from '@/components/ui/badge';
@@ -106,6 +107,7 @@ export default function LaboratoriesPage() {
   const { can } = usePermissions();
   const { data: laboratories = [], isLoading, isError, refetch } = useLaboratories();
   const [editing, setEditing] = useState(null);
+  const [logoOf, setLogoOf] = useState(null);
 
   const rows = useMemo(
     () =>
@@ -149,9 +151,15 @@ export default function LaboratoriesPage() {
       label: 'Acciones',
       render: (row) =>
         can('laboratories:update') && (
-          <Button variant="secondary" size="sm" className="max-md:h-11" onClick={() => setEditing(row)}>
-            Editar
-          </Button>
+          <span className="flex flex-wrap gap-2">
+            <Button variant="secondary" size="sm" className="max-md:h-11" onClick={() => setEditing(row)}>
+              Editar
+            </Button>
+            <Button variant="secondary" size="sm" className="max-md:h-11" onClick={() => setLogoOf(row)}>
+              <Icon icon="mdi:image-outline" className="size-4" aria-hidden="true" />
+              Logo
+            </Button>
+          </span>
         ),
     },
   ];
@@ -191,6 +199,11 @@ export default function LaboratoriesPage() {
         )}
       </Panel>
       <LaboratoryFormDialog open={editing !== null} onClose={() => setEditing(null)} laboratory={editing?.lab_id ? editing : undefined} />
+      <Dialog open={logoOf !== null} onOpenChange={(open) => !open && setLogoOf(null)}>
+        <DialogContent title={`Logo de ${logoOf?.lab_name ?? ''}`} description="Sale en el encabezado del PDF de resultados de este laboratorio.">
+          {logoOf && <LogoField labId={logoOf.lab_id} name={logoOf.lab_name} />}
+        </DialogContent>
+      </Dialog>
     </LayoutDashboard>
   );
 }

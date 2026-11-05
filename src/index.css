@@ -114,6 +114,14 @@
     line-height: 1.5;
   }
 
+  /* lista desplegable de los select nativos: algunos navegadores (Chrome en Windows)
+     la pintan con fondo claro aunque el control sea oscuro */
+  select option,
+  select optgroup {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+
   /* foco visible con teclado en todos los controles */
   :focus-visible {
     outline: 2px solid var(--color-primary);

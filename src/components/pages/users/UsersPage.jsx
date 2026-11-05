@@ -80,7 +80,7 @@ export default function UsersPage() {
       label: 'Acciones',
       render: (row) =>
         can('users:update') &&
-        !(row.role?.rol_is_system && !isSystem) && (
+        row.manageable !== false && (
           <>
             <Button variant="secondary" size="sm" className="max-md:h-11" onClick={() => setEditing(row)}>
               Editar

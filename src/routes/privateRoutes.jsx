@@ -22,6 +22,7 @@ const PatientsPage = lazy(() => import('../components/pages/customer/PatientsPag
 const CreateOrderPage = lazy(() => import('../components/pages/orders/CreateOrderPage'));
 const ResultsCapturePage = lazy(() => import('../components/pages/results/ResultsCapturePage'));
 const ProfilePage = lazy(() => import('../components/profile/ProfilePage'));
+const MyLaboratoryPage = lazy(() => import('../components/laboratory/MyLaboratoryPage'));
 const SearchOrdersPage = lazy(() => import('../components/pages/orders/SearchOrdersPage'));
 
 /**
@@ -91,6 +92,7 @@ const privateRoutes = [
   { path: '/orders/search', element: guard(<SearchOrdersPage />, 'orders:view') },
   // cada usuario ve su perfil y su firma (solo exige sesión)
   { path: '/profile', element: <ProfilePage /> },
+  { path: '/my-laboratory', element: guard(<MyLaboratoryPage />, 'laboratory_profile:view') },
   { path: '*', element: <Navigate to="/dashboard" replace /> },
 ];
 

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Field, Input, Select } from '@/components/ui/field';
 import { useSaveUser } from '../../../hooks/queries/useAdmin';
+import { usePermissions } from '../../../hooks/usePermissions';
 import { errorMessage } from '@/lib/utils';
 
 const EMPTY = { use_primer_nombre: '', use_primer_apellido: '', use_correo: '', use_documento: '', use_telefono: '', use_cargo: '', use_registro_profesional: '', role: '' };
@@ -16,6 +17,9 @@ const EMPTY = { use_primer_nombre: '', use_primer_apellido: '', use_correo: '', 
 export default function UserFormDialog({ open, onClose, user, roles, laboratoryId, isSelf = false }) {
   const saveUser = useSaveUser();
   const editing = Boolean(user);
+  // el correo es la llave de la cuenta: en un usuario existente solo lo cambia el super administrador
+  const { isSystem } = usePermissions();
+  const emailLocked = editing && !isSystem;
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ defaultValues: EMPTY });
 
   useEffect(() => {
@@ -44,6 +48,7 @@ export default function UserFormDialog({ open, onClose, user, roles, laboratoryI
     for (const key of ['use_documento', 'use_telefono', 'use_cargo', 'use_registro_profesional']) if (!data[key]) delete data[key];
     if (editing && data.role === user.role?.rol_id) delete data.role;
     if (!editing && laboratoryId) data.laboratory = laboratoryId;
+    if (emailLocked) delete data.use_correo;
 
     saveUser.mutate(
       { id: user?.use_id, data },
@@ -83,12 +88,18 @@ export default function UserFormDialog({ open, onClose, user, roles, laboratoryI
           <Field label="Apellido" error={errors.use_primer_apellido?.message}>
             {(field) => <Input autoComplete="off" maxLength={50} {...field} {...register('use_primer_apellido', required('Escribe el apellido'))} />}
           </Field>
-          <Field label="Correo electrónico" error={errors.use_correo?.message} className="sm:col-span-2">
+          <Field
+            label="Correo electrónico"
+            error={errors.use_correo?.message}
+            hint={emailLocked ? 'Solo el super administrador puede cambiar el correo.' : undefined}
+            className="sm:col-span-2"
+          >
             {(field) => (
               <Input
                 type="email"
                 autoComplete="off"
                 maxLength={120}
+                readOnly={emailLocked}
                 {...field}
                 {...register('use_correo', {
                   required: 'Escribe el correo',

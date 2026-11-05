@@ -116,11 +116,9 @@ export default function CreateOrderPage() {
     createOrder.mutate(
       {
         cus_id: customer.cus_id,
-        exa_ids: items.map((i) => i.exa_id),
+        // un id por unidad; el servidor calcula el descuento y el total con los precios del catálogo
+        exa_ids: items.flatMap((i) => Array(i.quantity).fill(i.exa_id)),
         ord_discount_percentage: totals.percent,
-        ord_discount_value: totals.discountValue,
-        ord_total_value: totals.total,
-        ord_status: 'PENDIENTE',
       },
       {
         onSuccess: (response) => {
