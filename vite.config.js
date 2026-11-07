@@ -58,6 +58,18 @@ function securityHeaders(env) {
   };
 }
 
+/**
+ * Dominios con los que `vite preview` acepta peticiones (sin esto responde "Blocked request"):
+ * los de Railway (*.up.railway.app) y los propios en ALLOWED_HOSTS, separados por coma
+ */
+function allowedHosts(env) {
+  const extra = (env.ALLOWED_HOSTS ?? '')
+    .split(',')
+    .map((host) => host.trim())
+    .filter(Boolean);
+  return ['.up.railway.app', ...extra];
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = { ...loadEnv(mode, process.cwd(), 'VITE_'), ...process.env };
@@ -70,6 +82,7 @@ export default defineConfig(({ mode }) => {
     },
     preview: {
       headers: securityHeaders(env),
+      allowedHosts: allowedHosts(env),
     },
   };
 });
